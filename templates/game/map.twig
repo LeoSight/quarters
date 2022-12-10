@@ -5,6 +5,11 @@
 
     </div>
     <div class="location">
-
+        <p>Právě se nacházíš na souřadnicích: <strong>{{ x }},{{ y }}</strong></p>
+        <ul>
+            {% for player in location.players %}
+                <li>{{ player.username|e }}</li>
+            {% endfor %}
+        </ul>
     </div>
 {% endblock %}
