@@ -1,0 +1,44 @@
+@import 'variables';
+
+.headline {
+    font-size: 5rem;
+    margin: 0;
+}
+
+.container {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.full {
+    width: 100%;
+    height: 100%;
+}
+
+.button {
+    padding: 0.25rem 0.5rem;
+    border: 0.2rem solid $link;
+    text-transform: uppercase;
+    font-weight: 700;
+
+    &:hover {
+        border-color: $link-hover;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .desktop-only {
+        display: none;
+    }
+}

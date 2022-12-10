@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik+80s+Fade&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&display=swap');
+
+@import 'reset';
+@import 'utils';
+@import 'variables';
+@import 'menu';
+
+body {
+    background-color: #050505;
+    color: #fff;
+    font-family: 'Roboto Mono', monospace;
+}
+
+h1 {
+    font-family: 'Rubik 80s Fade', cursive;
+}
+
+a {
+    color: $link;
+    text-decoration: none;
+
+    &:hover {
+        color: $link-hover;
+    }
+}
