@@ -36,7 +36,7 @@ class MapController extends AbstractController
     }
 
     // pouze dočasné pro testování
-    #[Route('/game/map/move/{x}/{y}', name: 'game_map_move', requirements: ['x' => '[0-9\-]+', 'y' => '[0-9\-]+'])]
+    #[Route('/game/map/move/{x}/{y}', name: 'game_map_move', requirements: ['x' => '\-?[0-9]+', 'y' => '\-?[0-9]+'])]
     public function move(int $x, int $y, ManagerRegistry $doctrine): Response
     {
         $me = new UserService($this->getUser(), $doctrine);
