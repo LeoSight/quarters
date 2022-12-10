@@ -20,19 +20,22 @@ class MapController extends AbstractController
         $y = $me->user->getY();
 
         $players = [];
-        $usersOnLocation = $doctrine->getRepository(User::class)->findBy([ 'x' => $x, 'y' => $y ]);
+        /*$usersOnLocation = $doctrine->getRepository(User::class)->findBy([ 'x' => $x, 'y' => $y ]);
         foreach($usersOnLocation as $user){
-            /* @var $user User */
-            //if($me->user->getId() != $user->getId()){
             $players[] = [ 'id' => $user->getId(), 'username' => $user->getUserIdentifier() ];
-            //}
+        }*/
+
+        $allPlayers = $doctrine->getRepository(User::class)->findAll();
+        foreach($allPlayers as $player){
+            /* @var $player User */
+            $players[] = [ 'id' => $player->getId(), 'username' => $player->getUserIdentifier(), 'x' => $player->getX(), 'y' => $player->getY() ];
         }
 
         $location = [
-            'players' => $players
+            //'players' => $players
         ];
 
-        return $this->render('game/map.twig', [ 'x' => $x, 'y' => $y, 'location' => $location ]);
+        return $this->render('game/map.twig', [ 'x' => $x, 'y' => $y, 'location' => $location, 'players' => $players ]);
     }
 
     // pouze dočasné pro testování
