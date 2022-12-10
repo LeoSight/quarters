@@ -5,9 +5,10 @@
 @import 'utils';
 @import 'variables';
 @import 'menu';
+@import 'map';
 
 body {
-    background-color: #050505;
+    background-color: $background;
     color: #fff;
     font-family: 'Roboto Mono', monospace;
 }
@@ -23,4 +24,8 @@ a {
     &:hover {
         color: $link-hover;
     }
+}
+
+footer {
+    margin-bottom: 8rem;
 }
