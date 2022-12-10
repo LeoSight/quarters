@@ -21,6 +21,15 @@ class User implements UserInterface
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $lastSeen = null;
 
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Faction $faction = null;
+
+    #[ORM\Column]
+    private ?int $x = 0;
+
+    #[ORM\Column]
+    private ?int $y = 0;
+
     /*
     #[ORM\Column(type: 'json')]
     private array $roles = [];
@@ -104,6 +113,55 @@ class User implements UserInterface
     public function setLastSeen(?\DateTimeInterface $lastSeen): self
     {
         $this->lastSeen = $lastSeen;
+
+        return $this;
+    }
+
+    public function getFaction(): ?Faction
+    {
+        return $this->faction;
+    }
+
+    public function setFaction(?Faction $faction): self
+    {
+        $this->faction = $faction;
+
+        return $this;
+    }
+
+    public function getX(): ?int
+    {
+        return $this->x;
+    }
+
+    public function setX(int $x): self
+    {
+        $this->x = $x;
+
+        return $this;
+    }
+
+    public function getY(): ?int
+    {
+        return $this->y;
+    }
+
+    public function setY(int $y): self
+    {
+        $this->y = $y;
+
+        return $this;
+    }
+
+    public function getCoords(): ?array
+    {
+        return [$this->x, $this->y];
+    }
+
+    public function setCoords(array $coords): self
+    {
+        $this->x = $coords[0];
+        $this->y = $coords[1];
 
         return $this;
     }
