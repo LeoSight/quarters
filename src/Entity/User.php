@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -29,6 +31,14 @@ class User implements UserInterface
 
     #[ORM\Column]
     private ?int $y = 0;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Soldier::class)]
+    private Collection $soldiers;
+
+    public function __construct()
+    {
+        $this->soldiers = new ArrayCollection();
+    }
 
     /*
     #[ORM\Column(type: 'json')]
@@ -162,6 +172,36 @@ class User implements UserInterface
     {
         $this->x = $coords[0];
         $this->y = $coords[1];
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Soldier>
+     */
+    public function getSoldiers(): Collection
+    {
+        return $this->soldiers;
+    }
+
+    public function addSoldier(Soldier $soldier): self
+    {
+        if (!$this->soldiers->contains($soldier)) {
+            $this->soldiers->add($soldier);
+            $soldier->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSoldier(Soldier $soldier): self
+    {
+        if ($this->soldiers->removeElement($soldier)) {
+            // set the owning side to null (unless already changed)
+            if ($soldier->getUser() === $this) {
+                $soldier->setUser(null);
+            }
+        }
 
         return $this;
     }
