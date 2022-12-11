@@ -6,7 +6,6 @@
 /.idea/
 /.vscode/
 /docker/mysql
-yarn.lock
 
 ###> symfony/framework-bundle ###
 /.env.local
