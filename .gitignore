@@ -15,6 +15,7 @@
 /public/bundles/
 /var/
 /vendor/
+/.ecs_cache
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
