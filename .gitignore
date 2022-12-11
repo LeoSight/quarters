@@ -5,6 +5,7 @@
 /.php-version
 /.idea/
 /.vscode/
+/docker/mysql
 
 ###> symfony/framework-bundle ###
 /.env.local
