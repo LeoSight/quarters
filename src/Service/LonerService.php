@@ -25,7 +25,7 @@ class LonerService {
     public function findLonerByChance(int $x, int $y): void
     {
         $users = $this->userRepository->findBy([ 'x' => $x, 'y' => $y ]);
-        if(count($users) <= 1 && rand(1,10) == 1){
+        if(count($users) <= 1 && rand(1,1) == 1){
             $this->generateLoner($x, $y);
         }
     }
@@ -34,9 +34,10 @@ class LonerService {
     {
         $locales = ['cs_CZ','en_US','en_GB','pl_PL','sk_SK','de_DE'];
         $faker = Faker\Factory::create($locales[array_rand($locales)]);
+        $gender = rand(1,3) == 1 ? 'female' : 'male';
 
         $loner = new Loner();
-        $loner->setName($faker->name());
+        $loner->setName($faker->firstName($gender) . ' ' . $faker->lastName($gender));
         $loner->setX($x);
         $loner->setY($y);
         $loner->setRole(SoldierRoles::CITIZEN->value);

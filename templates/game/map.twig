@@ -5,11 +5,14 @@
         <div class="location">
             <p>Zpravodajské informace jsou aktuální k času {{ 'now' | date('H:i') }}</p>
             <p>Právě se nacházíš na souřadnicích: <strong>{{ x }},{{ y }}</strong></p>
+            {% if location.battle %}
+                <p class="red">Právě zde probíhá bitva!</p>
+            {% endif %}
             <p>Na tomto poli se nachází tito hráči:</p>
             <ul>
                 {% for player in players %}
                     {% if player.x == x and player.y == y %}
-                        <li>{{ player.username|e }}</li>
+                        <li>{{ player.username|e }} ({{ player.size }})</li>
                     {% endif %}
                 {% endfor %}
             </ul>

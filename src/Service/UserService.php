@@ -14,7 +14,7 @@ class UserService {
     private ObjectManager $manager;
 
     function __construct(
-        UserInterface $userInterface,
+        ?UserInterface $userInterface,
         private readonly ManagerRegistry $doctrine,
     ) {
         $this->manager = $this->doctrine->getManager();

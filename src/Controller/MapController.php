@@ -6,6 +6,7 @@ use App\Entity\Action;
 use App\Entity\User;
 use App\Enum\ActionTypes;
 use App\Repository\ActionRepository;
+use App\Repository\BattleRepository;
 use App\Repository\LonerRepository;
 use App\Repository\UserRepository;
 use App\Service\LonerService;
@@ -20,6 +21,7 @@ class MapController extends AbstractController
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly LonerRepository $lonerRepository,
+        private readonly BattleRepository $battleRepository,
         private readonly LonerService $lonerService,
         private readonly ManagerRegistry $doctrine
     ) {}
@@ -60,7 +62,11 @@ class MapController extends AbstractController
             $loners[] = [ 'id' => $loner->getId(), 'name' => $loner->getName() ];
         }
 
-        $location = [];
+        $battle = $this->battleRepository->findOneBy([ 'x' => $x, 'y' => $y ]);
+
+        $location = [
+            'battle' => $battle
+        ];
 
         return $this->render('game/map.twig', [
             'x' => $x,

@@ -46,7 +46,7 @@ class Soldier
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
 
@@ -70,7 +70,7 @@ class Soldier
         return $this->role;
     }
 
-    public function setRole(int $role): self
+    public function setRole(?int $role): self
     {
         $this->role = $role;
 
@@ -82,7 +82,7 @@ class Soldier
         return $this->health;
     }
 
-    public function setHealth(int $health): self
+    public function setHealth(?int $health): self
     {
         $this->health = $health;
 
@@ -94,7 +94,7 @@ class Soldier
         return $this->experience;
     }
 
-    public function setExperience(int $experience): self
+    public function setExperience(?int $experience): self
     {
         $this->experience = $experience;
 
@@ -106,7 +106,7 @@ class Soldier
         return $this->weapon;
     }
 
-    public function setWeapon(int $weapon): self
+    public function setWeapon(?int $weapon): self
     {
         $this->weapon = $weapon;
 
