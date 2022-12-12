@@ -9,20 +9,24 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserService {
 
-    public User $user;
+    /** @var User $user */
+    public UserInterface $user;
     private ObjectManager $manager;
 
-    function __construct(?UserInterface $user, ManagerRegistry $doctrine){
-        /** @var User $user */
-        $this->user = $user;
-        $this->manager = $doctrine->getManager();
-
+    function __construct(
+        UserInterface $userInterface,
+        private readonly ManagerRegistry $doctrine,
+    ) {
+        $this->manager = $this->doctrine->getManager();
+        $this->user = $userInterface;
         $this->user->setLastSeen(new \DateTime('now'));
     }
 
     function __destruct(){
-        $this->manager->persist($this->user);
-        $this->manager->flush();
+        if ($this->manager->isOpen()) {
+            $this->manager->persist($this->user);
+            $this->manager->flush();
+        }
     }
 
 }
