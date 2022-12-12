@@ -81,6 +81,27 @@ class MapController extends AbstractController
         $user = $me->user;
         //$user->setCoords([ $x, $y ]);
 
+        $options = [
+            [0, -1],
+            [-1, $user->getX() % 2 == 0 ? -1 : 0],
+            [1, $user->getX() % 2 == 0 ? -1 : 0],
+            [-1, $user->getX() % 2 == 0 ? 0 : 1],
+            [1, $user->getX() % 2 == 0 ? 0 : 1],
+            [0, 1],
+        ];
+
+        $isValidMove = false;
+        foreach($options as $option){
+            if($user->getX() + $option[0] == $x && $user->getY() + $option[1] == $y){
+                $isValidMove = true;
+                break;
+            }
+        }
+
+        if(!$isValidMove){
+            throw new \RuntimeException("Invalid move!");
+        }
+
         if($user->getBusyTill() > new \DateTime()){
             return $this->redirectToRoute('game_map');
         }
