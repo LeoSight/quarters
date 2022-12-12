@@ -68,11 +68,9 @@ class MapController extends AbstractController
             $loners[] = [ 'id' => $loner->getId(), 'name' => $loner->getName() ];
         }
 
-        $battle = $this->battleRepository->findOneBy([ 'x' => $x, 'y' => $y ]);
+        $battles = $this->battleRepository->findAll();
 
-        $location = [
-            'battle' => $battle
-        ];
+        $location = [];
 
         return $this->render('game/map.twig', [
             'x' => $x,
@@ -80,6 +78,7 @@ class MapController extends AbstractController
             'location' => $location,
             'players' => $players,
             'loners' => $loners,
+            'battles' => $battles,
             'busy' => $busy,
             'current' => $current
         ]);

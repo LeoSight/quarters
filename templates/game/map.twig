@@ -9,9 +9,11 @@
         <div class="location">
             <p>Zpravodajské informace jsou aktuální k času {{ 'now' | date('H:i') }}</p>
             <p>Právě se nacházíš na souřadnicích: <strong>{{ x }},{{ y }}</strong></p>
-            {% if location.battle %}
-                <p class="red">Právě zde probíhá bitva!</p>
-            {% endif %}
+            {% for battle in battles %}
+                {% if battle.x == x and battle.y == y %}
+                    <p class="red">Právě zde probíhá bitva!</p>
+                {% endif %}
+            {% endfor %}
             <p>Na tomto poli se nachází tito hráči:</p>
             <ul>
                 {% for player in players %}
