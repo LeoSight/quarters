@@ -2,6 +2,7 @@
 
 namespace App\Enum;
 
-enum ActionTypes: int {
+enum ActionTypes: int
+{
     case MOVE = 1;
 }

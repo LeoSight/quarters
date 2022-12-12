@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\SoldierRepository;
+use App\Repository\LonerRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SoldierRepository::class)]
-#[ORM\Table(name: '`soldiers`')]
-class Soldier
+#[ORM\Entity(repositoryClass: LonerRepository::class)]
+#[ORM\Table(name: '`loners`')]
+class Loner
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -18,8 +18,11 @@ class Soldier
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\ManyToOne(inversedBy: 'soldiers')]
-    private ?User $user = null;
+    #[ORM\Column]
+    private ?int $x = null;
+
+    #[ORM\Column]
+    private ?int $y = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $role = null;
@@ -53,14 +56,26 @@ class Soldier
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getX(): ?int
     {
-        return $this->user;
+        return $this->x;
     }
 
-    public function setUser(?User $user): self
+    public function setX(int $x): self
     {
-        $this->user = $user;
+        $this->x = $x;
+
+        return $this;
+    }
+
+    public function getY(): ?int
+    {
+        return $this->y;
+    }
+
+    public function setY(int $y): self
+    {
+        $this->y = $y;
 
         return $this;
     }

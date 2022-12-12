@@ -13,11 +13,19 @@
                     {% endif %}
                 {% endfor %}
             </ul>
+            {% if loners is not empty %}
+                <p>Na tomto poli se nachází odpadlíci:</p>
+                <ul>
+                    {% for loner in loners %}
+                        <li>{{ loner.name }} <a href="/game/recruit/{{ loner.id }}">Naverbovat</a></li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
             {% if busy %}
                 <p class="red">Tvá jednotka právě plní rozkaz, bude zaneprázdněná až do {{ busy }}</p>
-            {% endif %}
-            {% if current and current.type == 1 %}
-                <p class="red">Právě probíhá přesun na souřadnice {{ current.data.x }},{{ current.data.y }}</p>
+                {% if current and current.type == 1 %}
+                    <p class="red">Právě probíhá přesun na souřadnice {{ current.data.x }},{{ current.data.y }}</p>
+                {% endif %}
             {% endif %}
         </div>
         <div class="map">

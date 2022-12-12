@@ -17,6 +17,7 @@ class ActionService {
 
     public function __construct(
         private readonly ActionRepository $actionRepository,
+        private readonly LonerService $lonerService
     )
     {
         $encoders = [new JsonEncoder()];
@@ -48,6 +49,8 @@ class ActionService {
         if(!$data instanceof MoveAction){
             throw new \RuntimeException("Data cannot be serialized!");
         }
+
+        $this->lonerService->findLonerByChance($data->getX(), $data->getY());
 
         $action->getUser()->setCoords([ $data->getX(), $data->getY() ]);
         $action->setStatus(ActionStates::DONE->value);

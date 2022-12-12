@@ -1,0 +1,14 @@
+{% extends "layout.twig" %}
+
+{% block header %}
+    <h1>JEDNOTKA</h1>
+{% endblock %}
+
+{% block main %}
+    <p>Počet členů: {{ soldiers|length }}</p>
+    <ul>
+        {% for soldier in soldiers %}
+            <li>{{ soldier.name }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
