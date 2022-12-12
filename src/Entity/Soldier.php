@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\SoldierRoles;
 use App\Repository\SoldierRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -21,8 +22,8 @@ class Soldier
     #[ORM\ManyToOne(inversedBy: 'soldiers')]
     private ?User $user = null;
 
-    #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $role = null;
+    #[ORM\Column(enumType: SoldierRoles::class)]
+    private ?SoldierRoles $role = SoldierRoles::CITIZEN;
 
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $health = 100;
@@ -46,7 +47,7 @@ class Soldier
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
 
@@ -65,12 +66,12 @@ class Soldier
         return $this;
     }
 
-    public function getRole(): ?int
+    public function getRole(): ?SoldierRoles
     {
         return $this->role;
     }
 
-    public function setRole(int $role): self
+    public function setRole(?SoldierRoles $role): self
     {
         $this->role = $role;
 
@@ -82,7 +83,7 @@ class Soldier
         return $this->health;
     }
 
-    public function setHealth(int $health): self
+    public function setHealth(?int $health): self
     {
         $this->health = $health;
 
@@ -94,7 +95,7 @@ class Soldier
         return $this->experience;
     }
 
-    public function setExperience(int $experience): self
+    public function setExperience(?int $experience): self
     {
         $this->experience = $experience;
 
@@ -106,7 +107,7 @@ class Soldier
         return $this->weapon;
     }
 
-    public function setWeapon(int $weapon): self
+    public function setWeapon(?int $weapon): self
     {
         $this->weapon = $weapon;
 

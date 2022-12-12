@@ -27,3 +27,6 @@ services:
     App\Service\ActionService:
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: processActions }
+    App\Service\BattleService:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: processBattles }

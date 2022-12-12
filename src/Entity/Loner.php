@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\SoldierRoles;
 use App\Repository\LonerRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,8 +25,8 @@ class Loner
     #[ORM\Column]
     private ?int $y = null;
 
-    #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $role = null;
+    #[ORM\Column(enumType: SoldierRoles::class)]
+    private ?SoldierRoles $role = SoldierRoles::CITIZEN;
 
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $health = 100;
@@ -80,12 +81,12 @@ class Loner
         return $this;
     }
 
-    public function getRole(): ?int
+    public function getRole(): ?SoldierRoles
     {
         return $this->role;
     }
 
-    public function setRole(int $role): self
+    public function setRole(SoldierRoles $role): self
     {
         $this->role = $role;
 

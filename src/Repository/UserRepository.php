@@ -39,6 +39,17 @@ class UserRepository extends ServiceEntityRepository
         }
     }
 
+    public function findUsersOnSameField(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->select('COUNT(u.id) AS players, u.x, u.y')
+            ->groupBy('u.x')
+            ->addGroupBy('u.y')
+            ->having('COUNT(u.id) > 1')
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

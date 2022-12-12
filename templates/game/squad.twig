@@ -6,9 +6,12 @@
 
 {% block main %}
     <p>Počet členů: {{ soldiers|length }}</p>
-    <ul>
+    <table>
         {% for soldier in soldiers %}
-            <li>{{ soldier.name }}</li>
+            <tr>
+                <td>{{ soldier.name }}</td>
+                <td>{{ soldier.health }}%</td>
+            </tr>
         {% endfor %}
-    </ul>
+    </table>
 {% endblock %}
