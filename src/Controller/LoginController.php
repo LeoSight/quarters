@@ -3,17 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Repository\UserRepository;
+use App\Model\LoginData;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class LoginController extends AbstractController
 {
-    //private RequestStack $requestStack;
+    private Serializer $serializer;
 
     private string $backlink = 'lsq'; // přidělený název služby
     private string $successParams = '/login/confirm/%s'; // návratová cesta, pouze [A-Za-z0-9\%\/\.\?\&]
@@ -22,16 +24,11 @@ class LoginController extends AbstractController
     private string $tokenUrl = 'https://leosight.cz/api/public/login/token?b=%s&s=%s&f=%s';
     private string $captureUrl = 'https://leosight.cz/api/public/login/capture?token=%s';
 
-    /*public function __construct(RequestStack $requestStack)
-    {
-        $this->requestStack = $requestStack;
-    }*/
-
-    /*public function logged(): bool
-    {
-        $session = $this->requestStack->getSession();
-        return $session->get('user:id') != null;
-    }*/
+    public function __construct(){
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+        $this->serializer = new Serializer($normalizers, $encoders);
+    }
 
     #[Route('/login', name: 'app_login')]
     public function login(): Response
@@ -44,24 +41,20 @@ class LoginController extends AbstractController
     }
 
     #[Route('/login/confirm/{token}')]
-    public function confirm($token, ManagerRegistry $doctrine, Security $security): Response
+    public function confirm(string $token, ManagerRegistry $doctrine, Security $security): Response
     {
         $data = $this->capture($token);
 
-        if(!$data->logged){
+        if(!$data->getLogged() || $data->getId() == null || $data->getUsername() == null){
             return $this->redirect('/login/error/invalid');
         }
 
-        //$session = $this->requestStack->getSession();
-        //$session->set('user:id', $data->id);
-        //$session->set('user:name', $data->username);
-
-        $user = $doctrine->getRepository(User::class)->find($data->id);
+        $user = $doctrine->getRepository(User::class)->find($data->getId());
         if (!$user) {
             $entityManager = $doctrine->getManager();
 
             $user = new User();
-            $user->setId($data->id)->setUsername($data->username)->setLastSeen(new \DateTime('now'));
+            $user->setId($data->getId())->setUsername($data->getUsername())->setLastSeen(new \DateTime('now'));
 
             $entityManager->persist($user);
             $entityManager->flush();
@@ -75,9 +68,6 @@ class LoginController extends AbstractController
     #[Route('/logout', name: 'app_logout')]
     public function logout(Security $security): Response
     {
-        //$session = $this->requestStack->getSession();
-        //$session->clear();
-
         if($this->getUser()) {
             $security->logout(false);
         }
@@ -87,7 +77,12 @@ class LoginController extends AbstractController
 
     // volat pouze 1x! (úspěšný capture zruší platnost tokenu)
     // ex. output: [ 'logged' => false ] / [ 'logged' => true, 'id' => 1, 'username' => 'Rataj' ]
-    function capture($token){
+    /**
+     * @param string $token
+     * @return LoginData
+     */
+    function capture(string $token): LoginData
+    {
         $options = [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER         => false,
@@ -102,10 +97,23 @@ class LoginController extends AbstractController
         ];
 
         $ch = curl_init(sprintf($this->captureUrl, $token));
+        if(!$ch){
+            return (new LoginData())->setLogged(false);
+        }
+
         curl_setopt_array($ch, $options);
         $content = curl_exec($ch);
+        if(!$content){
+            return (new LoginData())->setLogged(false);
+        }
+
         curl_close($ch);
 
-        return json_decode($content);
+        $data = $this->serializer->deserialize($content, LoginData::class, 'json');
+        if(!$data instanceof LoginData){
+            return (new LoginData())->setLogged(false);
+        }
+
+        return $data;
     }
 }

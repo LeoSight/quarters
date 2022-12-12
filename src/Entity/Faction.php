@@ -28,6 +28,9 @@ class Faction
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $flag = null;
 
+    /**
+     * @var ArrayCollection<int, User>
+     */
     #[ORM\OneToMany(mappedBy: 'faction', targetEntity: User::class)]
     private Collection $users;
 

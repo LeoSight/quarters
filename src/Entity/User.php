@@ -27,17 +27,30 @@ class User implements UserInterface
     private ?Faction $faction = null;
 
     #[ORM\Column]
-    private ?int $x = 0;
+    private int $x = 0;
 
     #[ORM\Column]
-    private ?int $y = 0;
+    private int $y = 0;
 
+    /**
+     * @var ArrayCollection<int, Soldier>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Soldier::class)]
     private Collection $soldiers;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $busyTill = null;
+
+    /**
+     * @var ArrayCollection<int, Action>
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Action::class)]
+    private Collection $actions;
 
     public function __construct()
     {
         $this->soldiers = new ArrayCollection();
+        $this->actions = new ArrayCollection();
     }
 
     /*
@@ -109,7 +122,7 @@ class User implements UserInterface
     /**
      * @see UserInterface
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
@@ -163,11 +176,17 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getCoords(): ?array
+    /**
+     * @return array<int, int>
+     */
+    public function getCoords(): array
     {
         return [$this->x, $this->y];
     }
 
+    /**
+     * @param array<int, int> $coords
+     */
     public function setCoords(array $coords): self
     {
         $this->x = $coords[0];
@@ -200,6 +219,48 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($soldier->getUser() === $this) {
                 $soldier->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getBusyTill(): ?\DateTimeInterface
+    {
+        return $this->busyTill;
+    }
+
+    public function setBusyTill(?\DateTimeInterface $busyTill): self
+    {
+        $this->busyTill = $busyTill;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Action>
+     */
+    public function getActions(): Collection
+    {
+        return $this->actions;
+    }
+
+    public function addAction(Action $action): self
+    {
+        if (!$this->actions->contains($action)) {
+            $this->actions->add($action);
+            $action->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAction(Action $action): self
+    {
+        if ($this->actions->removeElement($action)) {
+            // set the owning side to null (unless already changed)
+            if ($action->getUser() === $this) {
+                $action->setUser(null);
             }
         }
 

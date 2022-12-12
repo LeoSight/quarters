@@ -13,6 +13,12 @@
                     {% endif %}
                 {% endfor %}
             </ul>
+            {% if busy %}
+                <p class="red">Tvá jednotka právě plní rozkaz, bude zaneprázdněná až do {{ busy }}</p>
+            {% endif %}
+            {% if current and current.type == 1 %}
+                <p class="red">Právě probíhá přesun na souřadnice {{ current.data.x }},{{ current.data.y }}</p>
+            {% endif %}
         </div>
         <div class="map">
             <div class="map-row">

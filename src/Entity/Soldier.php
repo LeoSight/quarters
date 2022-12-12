@@ -33,8 +33,8 @@ class Soldier
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $weapon = null;
 
-    #[ORM\Column(type: Types::JSON, nullable: true)]
-    private array $injuries = [];
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $injuries = null;
 
     public function getId(): ?int
     {
@@ -113,15 +113,30 @@ class Soldier
         return $this;
     }
 
-    public function getInjuries(): array
+    /**
+     * @return string[]|null Returns an array of strings or null
+     */
+    public function getInjuries(): ?array
     {
-        return $this->injuries;
+        $injuries = json_decode($this->injuries ?? '[]', true);
+        if(!is_array($injuries)){
+            return null;
+        }
+
+        return $injuries;
     }
 
+    /**
+     * @param array<int, string> $injuries
+     */
     public function setInjuries(?array $injuries): self
     {
-        $this->injuries = $injuries;
+        if(!$injuries){
+            $this->injuries = null;
+            return $this;
+        }
 
+        $this->injuries = json_encode($injuries) ?: null;
         return $this;
     }
 }

@@ -12,8 +12,8 @@ class UserService {
     public User $user;
     private ObjectManager $manager;
 
-    function __construct(UserInterface $user, ManagerRegistry $doctrine){
-        /** @var $user User */
+    function __construct(?UserInterface $user, ManagerRegistry $doctrine){
+        /** @var User $user */
         $this->user = $user;
         $this->manager = $doctrine->getManager();
 
