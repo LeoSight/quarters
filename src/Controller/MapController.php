@@ -115,7 +115,7 @@ class MapController extends AbstractController
         }
 
         if(!$isValidMove){
-            throw new \RuntimeException("Invalid move!");
+            return $this->redirectToRoute('game_map');
         }
 
         if($user->getBusyTill() > new \DateTime()){

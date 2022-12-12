@@ -17,7 +17,8 @@ class ActionService {
 
     public function __construct(
         private readonly ActionRepository $actionRepository,
-        private readonly LonerService $lonerService
+        private readonly LonerService $lonerService,
+        private readonly BattleService $battleService
     )
     {
         $encoders = [new JsonEncoder()];
@@ -54,6 +55,8 @@ class ActionService {
 
         $action->getUser()->setCoords([ $data->getX(), $data->getY() ]);
         $action->setStatus(ActionStates::DONE);
+
+        $this->battleService->startBattles();
     }
 
 }

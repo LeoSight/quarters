@@ -20,22 +20,14 @@ class BattleService {
         $this->manager = $this->doctrine->getManager();
     }
 
-    // TODO: přesunout zahajování bitev do této funkce, která bude volaná z akcí přesunu, pro lepší performance
     public function startBattles(): void
-    {
-
-    }
-
-    // pouze basic simulace, později se kompletně překope
-    // TODO: zrušení bitvy, pokud nikdo nemá přítomného nepřítele (přestože je více hráčů na jednom poli)
-    public function processBattles(): void
     {
         $activeBattles = [];
         $fields = $this->userRepository->findUsersOnSameField();
-        foreach($fields as $field){
-            $users = $this->userRepository->findBy([ 'x' => $field['x'], 'y' => $field['y'] ]);
-            $battle = $this->battleRepository->findOneBy([ 'x' => $field['x'], 'y' => $field['y'] ]);
-            if(!$battle){
+        foreach($fields as $field) {
+            $users = $this->userRepository->findBy(['x' => $field['x'], 'y' => $field['y']]);
+            $battle = $this->battleRepository->findOneBy(['x' => $field['x'], 'y' => $field['y']]);
+            if (!$battle) {
                 // TODO: kontrola frakcí
 
                 $battle = new Battle();
@@ -44,6 +36,27 @@ class BattleService {
                 $battle->setLastSimulation(new \DateTime());
                 $this->manager->persist($battle);
             }
+
+            $activeBattles[] = $battle->getId();
+        }
+
+        $battles = $this->battleRepository->findAll();
+        foreach($battles as $battle){
+            if(!in_array($battle->getId(), $activeBattles)){
+                $this->manager->remove($battle);
+            }
+        }
+
+        $this->manager->flush();
+    }
+
+    // pouze basic simulace, později se kompletně překope
+    // TODO: zrušení bitvy, pokud nikdo nemá přítomného nepřítele (přestože je více hráčů na jednom poli)
+    public function processBattles(): void
+    {
+        $battles = $this->battleRepository->findAll();
+        foreach($battles as $battle){
+            $users = $this->userRepository->findBy(['x' => $battle->getX(), 'y' => $battle->getY()]);
 
             $diff = $battle->getLastSimulation()->diff(new \DateTime());
             $minutes = $diff->days * 24 * 60 + $diff->h * 60 + $diff->i;
@@ -82,15 +95,6 @@ class BattleService {
                 }
 
                 $battle->setLastSimulation(new \DateTime());
-            }
-
-            $activeBattles[] = $battle->getId();
-        }
-
-        $battles = $this->battleRepository->findAll();
-        foreach($battles as $battle){
-            if(!in_array($battle->getId(), $activeBattles)){
-                $this->manager->remove($battle);
             }
         }
 
