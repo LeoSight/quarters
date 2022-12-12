@@ -22,7 +22,7 @@ class Battle
     private ?int $y = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $lastSimulation = null;
+    private \DateTimeInterface $lastSimulation;
 
     public function getId(): ?int
     {
@@ -53,7 +53,7 @@ class Battle
         return $this;
     }
 
-    public function getLastSimulation(): ?\DateTimeInterface
+    public function getLastSimulation(): \DateTimeInterface
     {
         return $this->lastSimulation;
     }

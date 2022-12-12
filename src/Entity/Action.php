@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Enum\ActionStates;
+use App\Enum\ActionTypes;
 use App\Repository\ActionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,11 +21,11 @@ class Action
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $type = null;
+    #[ORM\Column(enumType: ActionTypes::class)]
+    private ?ActionTypes $type = null;
 
-    #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $status = 0;
+    #[ORM\Column(enumType: ActionStates::class)]
+    private ?ActionStates $status = ActionStates::TO_BE_RAN;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $runTime = null;
@@ -48,24 +50,24 @@ class Action
         return $this;
     }
 
-    public function getType(): ?int
+    public function getType(): ?ActionTypes
     {
         return $this->type;
     }
 
-    public function setType(int $type): self
+    public function setType(ActionTypes $type): self
     {
         $this->type = $type;
 
         return $this;
     }
 
-    public function getStatus(): ?int
+    public function getStatus(): ?ActionStates
     {
         return $this->status;
     }
 
-    public function setStatus(int $status): self
+    public function setStatus(ActionStates $status): self
     {
         $this->status = $status;
 

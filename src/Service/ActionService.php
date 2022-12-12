@@ -36,7 +36,7 @@ class ActionService {
     public function runAction(Action $action): void
     {
         // TODO: až budeme v budoucnu přidávat více časovaných akcí, bude to tu nutné překopat
-        if($action->getType() != ActionTypes::MOVE->value){
+        if($action->getType() != ActionTypes::MOVE){
             throw new \RuntimeException("It's middleware time! 💀");
         }
 
@@ -53,7 +53,7 @@ class ActionService {
         $this->lonerService->findLonerByChance($data->getX(), $data->getY());
 
         $action->getUser()->setCoords([ $data->getX(), $data->getY() ]);
-        $action->setStatus(ActionStates::DONE->value);
+        $action->setStatus(ActionStates::DONE);
     }
 
 }

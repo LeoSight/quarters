@@ -25,7 +25,7 @@ class LonerService {
     public function findLonerByChance(int $x, int $y): void
     {
         $users = $this->userRepository->findBy([ 'x' => $x, 'y' => $y ]);
-        if(count($users) <= 1 && rand(1,1) == 1){
+        if(count($users) <= 1 && rand(1,20) == 1){
             $this->generateLoner($x, $y);
         }
     }
@@ -40,7 +40,7 @@ class LonerService {
         $loner->setName($faker->firstName($gender) . ' ' . $faker->lastName($gender));
         $loner->setX($x);
         $loner->setY($y);
-        $loner->setRole(SoldierRoles::CITIZEN->value);
+        $loner->setRole(SoldierRoles::CITIZEN);
         $loner->setHealth(100);
         $loner->setExperience(0);
         $loner->setWeapon(0);

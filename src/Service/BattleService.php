@@ -67,7 +67,7 @@ class BattleService {
                             continue;
                         }
 
-                        $hits = min($manpower, rand(1, ceil($enemyManpower / 2)));
+                        $hits = min($manpower, rand(1, (int)ceil($enemyManpower / 2)));
                         for ($h = 0; $h < $hits; $h++) {
                             $soldiersArray = $user->getSoldiers()->toArray();
                             $unfortunate = $soldiersArray[array_rand($soldiersArray)];
