@@ -10,7 +10,6 @@ use App\Repository\BattleRepository;
 use App\Repository\LonerRepository;
 use App\Repository\UserRepository;
 use App\Service\LonerService;
-use App\Service\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
