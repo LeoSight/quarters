@@ -58,7 +58,8 @@ class MapController extends AbstractController
                 'username' => $player->getUserIdentifier(),
                 'x' => $player->getX(),
                 'y' => $player->getY(),
-                'size' => count($player->getSoldiers())
+                'size' => count($player->getSoldiers()),
+                'faction' => $player->getFaction()
             ];
         }
 

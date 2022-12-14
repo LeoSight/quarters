@@ -110,6 +110,10 @@
         "fix-all": [
             "@fix-cs",
             "@rector"
+        ],
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "symfony server:start"
         ]
     },
     "conflict": {

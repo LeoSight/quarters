@@ -47,10 +47,18 @@ class User implements UserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Action::class)]
     private Collection $actions;
 
+    /**
+     * @var ArrayCollection<int, Faction>
+     */
+    #[ORM\ManyToMany(targetEntity: Faction::class, mappedBy: 'applicants')]
+    #[ORM\JoinTable(name: "factions_applicants")]
+    private Collection $applications;
+
     public function __construct()
     {
         $this->soldiers = new ArrayCollection();
         $this->actions = new ArrayCollection();
+        $this->applications = new ArrayCollection();
     }
 
     /*
@@ -263,6 +271,44 @@ class User implements UserInterface
                 $action->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Faction>
+     */
+    public function getApplications(): Collection
+    {
+        return $this->applications;
+    }
+
+    public function addApplication(Faction $application): self
+    {
+        if (!$this->applications->contains($application)) {
+            $this->applications->add($application);
+            $application->addApplicant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApplication(Faction $application): self
+    {
+        if ($this->applications->removeElement($application)) {
+            $application->removeApplicant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAllApplications(): self
+    {
+        $this->applications->forAll(function(int $key, Faction $faction): bool {
+            $this->removeApplication($faction);
+            $faction->removeApplicant($this);
+            return true;
+        });
 
         return $this;
     }
