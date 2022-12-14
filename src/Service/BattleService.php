@@ -44,7 +44,7 @@ class BattleService {
                 }
             }
 
-            if (!$battle) {
+            if ($battle) {
                 $activeBattles[] = $battle->getId();
             }
         }
