@@ -37,6 +37,14 @@ class ActionService {
         foreach($actions as $action){
             $this->runAction($action);
         }
+
+        // smazání starých akcí
+        $oldActions = $this->actionRepository->findOldActions();
+        foreach($oldActions as $action){
+            $this->manager->remove($action);
+        }
+
+        $this->manager->flush();
     }
 
     public function runAction(Action $action): void

@@ -1,7 +1,32 @@
-{% set g = (( (18529 * x + 5132 * y)|abs ) % 67) %}
-{% set style = 'background-color:rgb(' ~ (60 + g) ~ ', 122, 106);color:rgb(' ~ (60 + g) ~ ', 122, 106);' %}
+{% set g1 = (( (18529 * x + 5132 * y)|abs ) % 67) %}
+{% set g2 = (x|abs % 8) + (y|abs % 8) %}
+{% set canMove = true %}
+{% set style = 'background-color:rgb(' ~ (60 + g1) ~ ', 122, 106);color:rgb(' ~ (60 + g1) ~ ', 122, 106);' %}
+{% if g2 < 5 %}
+    {% set style = 'background-color:rgb(' ~ (40 + g1) ~ ', 122, 106);color:rgb(' ~ (40 + g1) ~ ', 122, 106);' %}
+{% elseif g2 < 10 %}
+    {% set style = 'background-color:rgb(' ~ (80 - g1) ~ ', 122, 106);color:rgb(' ~ (80 - g1) ~ ', 122, 106);' %}
+{% endif %}
+
 {% set icon = '' %}
 {% set size = 0 %}
+
+{% for field in fields %}
+    {% if field.x == x and field.y == y %}
+        {% if field.type == 1 %}{# WATER #}
+            {% set canMove = false %}
+            {% set style = 'background-color:rgb(123,170,204);color:rgb(123,170,204);' %}
+        {% elseif field.type == 3 %}{# MOUNTAIN #}
+            {% set canMove = false %}
+            {% set style = 'background-color:rgb(102,106,110);color:rgb(102,106,110);' %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+{% if not canMove %}
+    {% set icon = '<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M5 5h2v2H5V5zm4 4H7V7h2v2zm2 2H9V9h2v2zm2 0h-2v2H9v2H7v2H5v2h2v-2h2v-2h2v-2h2v2h2v2h2v2h2v-2h-2v-2h-2v-2h-2v-2zm2-2v2h-2V9h2zm2-2v2h-2V7h2zm0 0V5h2v2h-2z" fill="currentColor"/> </svg>' %}
+{% endif %}
+
 {% for player in players %}
     {% if player.x == x and player.y == y %}
         {% set size = size + player.size %}
@@ -16,6 +41,7 @@
         {% set icon = icon ~ '<span class="squad-size">' ~ size ~ '</span>' %}
     {% endif %}
 {% endfor %}
+
 {% for battle in battles %}
     {% if battle.x == x and battle.y == y %}
         {# set icon = '<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"> <path d="M17 0h1v1h-1zM18 0h1v1h-1zM16 1h1v1h-1zM17 1h1v1h-1zM18 1h1v1h-1zM14 2h1v1h-1zM15 2h1v1h-1zM16 2h1v1h-1zM17 2h1v1h-1zM13 3h1v1h-1zM14 3h1v1h-1zM15 3h1v1h-1zM16 3h1v1h-1zM11 4h1v1h-1zM12 4h1v1h-1zM13 4h1v1h-1zM14 4h1v1h-1zM15 4h1v1h-1zM10 5h1v1h-1zM11 5h1v1h-1zM12 5h1v1h-1zM13 5h1v1h-1zM14 5h1v1h-1zM15 5h1v1h-1zM9 6h1v1H9zM10 6h1v1h-1zM11 6h1v1h-1zM12 6h1v1h-1zM13 6h1v1h-1zM7 7h1v1H7zM8 7h1v1H8zM9 7h1v1H9zM10 7h1v1h-1zM11 7h1v1h-1zM12 7h1v1h-1zM13 7h1v1h-1zM14 7h1v1h-1zM18 7h1v1h-1zM6 8h1v1H6zM7 8h1v1H7zM8 8h1v1H8zM9 8h1v1H9zM10 8h1v1h-1zM12 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM15 8h1v1h-1zM16 8h1v1h-1zM17 8h1v1h-1zM18 8h1v1h-1zM4 9h1v1H4zM5 9h1v1H5zM6 9h1v1H6zM7 9h1v1H7zM8 9h1v1H8zM9 9h1v1H9zM13 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM3 10h1v1H3zM4 10h1v1H4zM5 10h1v1H5zM6 10h1v1H6zM7 10h1v1H7zM8 10h1v1H8zM10 10h1v1h-1zM2 11h1v1H2zM3 11h1v1H3zM4 11h1v1H4zM5 11h1v1H5zM6 11h1v1H6zM7 11h1v1H7zM10 11h1v1h-1zM1 12h1v1H1zM2 12h1v1H2zM3 12h1v1H3zM4 12h1v1H4zM6 12h1v1H6zM7 12h1v1H7zM8 12h1v1H8zM9 12h1v1H9zM1 13h1v1H1zM2 13h1v1H2zM3 13h1v1H3zM4 13h1v1H4zM7 13h1v1H7zM8 13h1v1H8zM1 14h1v1H1zM2 14h1v1H2zM3 14h1v1H3zM4 14h1v1H4zM7 14h1v1H7zM8 14h1v1H8zM9 14h1v1H9zM2 15h1v1H2zM3 15h1v1H3zM8 15h1v1H8zM9 15h1v1H9zM3 16h1v1H3z" fill="currentColor"/> </svg>' #}
@@ -24,10 +50,25 @@
         {% set icon = icon ~ '<span class="squad-size">' ~ size ~ '</span>' %}
     {% endif %}
 {% endfor %}
+
+{% for town in towns %}
+    {% if town.x == x and town.y == y %}
+        {% set icon = '<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M10 2h4v5h2v2h-2v11h4v-9h2v9h2v2H2v-2h2V8h2v12h6V4h-2V2zM8 6V4h2v2H8zm0 0H6v2h2V6zm10 5h-2V9h2v2zm-8-1H8v2h2v-2zm-2 4h2v2H8v-2z" fill="currentColor"/> </svg>' %}
+        {% set icon = icon ~ '<span class="squad-size">' ~ size ~ '</span>' %}
+        {% if town.owner is not null %}
+            {% set style = 'background-color:#' ~ town.owner.color ~ ';color:#' ~ town.owner.color ~ ';' %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
 {% if type == 'current' %}
     <div class="hexagon current" style="{{ style }}">{{ icon|raw }}</div>
 {% elseif type == 'far' %}
     <div class="hexagon far" style="{{ style }}">{{ icon|raw }}</div>
-{% else %}
+{% elseif type == 'move' and canMove %}
     <a class="hexagon move" style="{{ style }}" href="/game/map/move/{{ x }}/{{ y }}">{{ icon|raw }}</a>
+{% elseif type == 'world' %}
+    <div class="hexagon" style="{{ style }}" data-x="{{ x }}" data-y="{{ y }}">{{ icon|raw }}</div>
+{% else %}
+    <div class="hexagon" style="{{ style }}">{{ icon|raw }}</div>
 {% endif %}
