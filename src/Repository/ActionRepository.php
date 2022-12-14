@@ -54,6 +54,20 @@ class ActionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return Action[] Returns an array of Action objects
+     */
+    public function findOldActions(): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.status = 1')
+            ->andWhere('a.runTime < :old')
+            ->setParameter('old', new \DateTime('-2 days'))
+            ->orderBy('a.runTime', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findUserCurrentAction(User $user): Action|null
     {
         return $this->findOneBy(['user' => $user, 'status' => 0]);

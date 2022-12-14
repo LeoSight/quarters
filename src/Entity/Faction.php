@@ -41,10 +41,17 @@ class Faction
     #[ORM\JoinTable(name: "factions_applicants")]
     private Collection $applicants;
 
+    /**
+     * @var ArrayCollection<int, Town>
+     */
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Town::class)]
+    private Collection $towns;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->applicants = new ArrayCollection();
+        $this->towns = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -150,6 +157,36 @@ class Faction
     public function removeApplicant(User $applicant): self
     {
         $this->applicants->removeElement($applicant);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Town>
+     */
+    public function getTowns(): Collection
+    {
+        return $this->towns;
+    }
+
+    public function addTown(Town $town): self
+    {
+        if (!$this->towns->contains($town)) {
+            $this->towns->add($town);
+            $town->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTown(Town $town): self
+    {
+        if ($this->towns->removeElement($town)) {
+            // set the owning side to null (unless already changed)
+            if ($town->getOwner() === $this) {
+                $town->setOwner(null);
+            }
+        }
 
         return $this;
     }

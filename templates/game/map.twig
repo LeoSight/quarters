@@ -40,6 +40,15 @@
                     <p class="red">Právě probíhá přesun na souřadnice {{ current.data.x }},{{ current.data.y }}</p>
                 {% endif %}
             {% endif %}
+            {% if location.town is not null %}
+                <h2 class="mt-2">{{ location.town.title|upper }}</h2>
+                {% if location.town.owner is not null %}
+                    <p>Toto město vlastní <strong style="color:#{{ location.town.owner.color }};">{{ location.town.owner.title }}</strong>.</p>
+                {% else %}
+                    <p>Toto město nikdo nevlastní!</p>
+                {% endif %}
+                <a href="/game/map/capture">Obsadit město</a>
+            {% endif %}
         </div>
         <div class="map">
             <div class="map-row">

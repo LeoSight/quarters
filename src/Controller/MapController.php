@@ -5,9 +5,12 @@ namespace App\Controller;
 use App\Entity\Action;
 use App\Entity\User;
 use App\Enum\ActionTypes;
+use App\Enum\FieldTypes;
 use App\Repository\ActionRepository;
 use App\Repository\BattleRepository;
+use App\Repository\FieldRepository;
 use App\Repository\LonerRepository;
+use App\Repository\TownRepository;
 use App\Repository\UserRepository;
 use App\Service\LonerService;
 use App\Service\UserService;
@@ -22,6 +25,8 @@ class MapController extends AbstractController
         private readonly UserRepository $userRepository,
         private readonly LonerRepository $lonerRepository,
         private readonly BattleRepository $battleRepository,
+        private readonly FieldRepository $fieldRepository,
+        private readonly TownRepository $townRepository,
         private readonly LonerService $lonerService,
         private readonly UserService $userService,
         private readonly ManagerRegistry $doctrine
@@ -69,8 +74,17 @@ class MapController extends AbstractController
         }
 
         $battles = $this->battleRepository->findAll();
+        $towns = $this->townRepository->findAll();
 
-        $location = [];
+        $fields = [];
+        $allFields = $this->fieldRepository->findAll();
+        foreach($allFields as $field){
+            $fields[] = [ 'x' => $field->getX(), 'y' => $field->getY(), 'type' => $field->getType()->value ];
+        }
+
+        $location = [
+            'town' => $this->townRepository->findOneBy([ 'x' => $x, 'y' => $y ])
+        ];
 
         return $this->render('game/map.twig', [
             'x' => $x,
@@ -79,8 +93,11 @@ class MapController extends AbstractController
             'players' => $players,
             'loners' => $loners,
             'battles' => $battles,
+            'fields' => $fields,
+            'towns' => $towns,
             'busy' => $busy,
-            'current' => $current
+            'current' => $current,
+            'user' => $user
         ]);
     }
 
@@ -107,6 +124,11 @@ class MapController extends AbstractController
                 $isValidMove = true;
                 break;
             }
+        }
+
+        $field = $this->fieldRepository->findOneBy([ 'x' => $x, 'y' => $y ]);
+        if($field && in_array($field->getType(), [FieldTypes::WATER, FieldTypes::MOUNTAIN])){
+            $isValidMove = false;
         }
 
         if(!$isValidMove){
@@ -148,5 +170,53 @@ class MapController extends AbstractController
         $this->lonerService->assignLonerToUser($loner, $user);
 
         return $this->redirectToRoute('game_squad');
+    }
+
+    #[Route('/game/map/capture', name: 'game_map_capture')]
+    public function capture(): Response
+    {
+        $user = $this->userService->entity($this->getUser());
+
+        if(!$user->getFaction()){
+            return $this->redirectToRoute('game_map');
+        }
+
+        $town = $this->townRepository->findOneBy([ 'x' => $user->getX(), 'y' => $user->getY() ]);
+        if(!$town || $town->getOwner() === $user->getFaction()){
+            return $this->redirectToRoute('game_map');
+        }
+
+        $enemySize = 0;
+        $players = $this->userRepository->findBy([ 'x' => $user->getX(), 'y' => $user->getY() ]);
+        foreach($players as $player){
+            // TODO: později nahradit diplomacií
+            if($player->getFaction() !== $user->getFaction()){
+                $enemySize += count($player->getSoldiers());
+            }
+        }
+
+        if($enemySize > 0){
+            return $this->redirectToRoute('game_map');
+        }
+
+        $town->setOwner($user->getFaction());
+
+        $this->doctrine->getManager()->persist($town);
+        $this->doctrine->getManager()->flush();
+
+        return $this->redirectToRoute('game_map');
+    }
+
+    #[Route('/game/map/world', name: 'game_map_world')]
+    public function world(): Response
+    {
+        $fields = [];
+        $allFields = $this->fieldRepository->findAll();
+        foreach($allFields as $field){
+            $fields[] = [ 'x' => $field->getX(), 'y' => $field->getY(), 'type' => $field->getType()->value ];
+        }
+
+        $towns = $this->townRepository->findAll();
+        return $this->render('game/worldmap.twig', [ 'players' => [], 'battles' => [], 'fields' => $fields, 'towns' => $towns ]);
     }
 }

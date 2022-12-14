@@ -18,16 +18,16 @@ $field: #6a7a6a;
 
 .map-row {
     width: 100%;
-    margin-bottom: -2rem*$sqrt3;
+    margin-bottom: -2em*$sqrt3;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .hexagon {
-    margin: 0.07rem 4.22rem;
-    width: 4rem;
-    height: 4rem*$sqrt3;
+    margin: 0.07em 4.22em;
+    width: 4em;
+    height: 4em*$sqrt3;
     background-color: $field;
     color: $field;
     position: relative;
@@ -41,18 +41,18 @@ $field: #6a7a6a;
         display: block;
         position: absolute;
         top: 0;
-        border-top: 2rem*$sqrt3 solid transparent;
-        border-bottom: 2rem*$sqrt3 solid transparent;
+        border-top: 2em*$sqrt3 solid transparent;
+        border-bottom: 2em*$sqrt3 solid transparent;
     }
 
     &:before {
-        left: -2rem;
-        border-right: 2rem solid;
+        left: -2em;
+        border-right: 2em solid;
     }
 
     &:after {
-        right: -2rem;
-        border-left: 2rem solid;
+        right: -2em;
+        border-left: 2em solid;
     }
 
     &.far {
@@ -73,11 +73,11 @@ $field: #6a7a6a;
     }
 
     &:first-child {
-        margin-left: 4.22rem * 0.5;
+        margin-left: 4.22em * 0.5;
     }
 
     &:last-child {
-        margin-right: 4.22rem * 0.5;
+        margin-right: 4.22em * 0.5;
     }
 
     svg {
@@ -88,7 +88,7 @@ $field: #6a7a6a;
     .player-icon {
         color: #fff;
         display: block;
-        width: 3.889rem;
+        width: 3.889em;
 
         & > svg {
             color: inherit;
@@ -99,9 +99,18 @@ $field: #6a7a6a;
 .squad-size {
     color: #fff;
     background: #111;
-    padding: 0 0.25rem;
+    padding: 0 0.25em;
     position: absolute;
-    right: -0.3rem;
-    bottom: 1rem;
+    right: -0.3em;
+    bottom: 1em;
     z-index: 1;
+}
+
+.world {
+    font-size: 3px;
+    padding-bottom: 0;
+
+    .hexagon {
+        margin: 0 3em;
+    }
 }
