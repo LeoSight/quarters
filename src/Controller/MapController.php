@@ -10,6 +10,7 @@ use App\Repository\BattleRepository;
 use App\Repository\LonerRepository;
 use App\Repository\UserRepository;
 use App\Service\LonerService;
+use App\Service\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,16 +23,14 @@ class MapController extends AbstractController
         private readonly LonerRepository $lonerRepository,
         private readonly BattleRepository $battleRepository,
         private readonly LonerService $lonerService,
+        private readonly UserService $userService,
         private readonly ManagerRegistry $doctrine
     ) {}
 
     #[Route('/game/map', name: 'game_map')]
     public function index(ActionRepository $actionRepository): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw new \RuntimeException(sprintf('Expected App\\Entity\\User, got %s', $user === null ? 'null' : get_class($user)));
-        }
+        $user = $this->userService->entity($this->getUser());
 
         $x = $user->getX();
         $y = $user->getY();
@@ -89,10 +88,7 @@ class MapController extends AbstractController
     #[Route('/game/map/move/{x}/{y}', name: 'game_map_move', requirements: ['x' => '\-?[0-9]+', 'y' => '\-?[0-9]+'])]
     public function move(int $x, int $y): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw new \RuntimeException(sprintf('Expected App\\Entity\\User, got %s', $user === null ? 'null' : get_class($user)));
-        }
+        $user = $this->userService->entity($this->getUser());
 
         //$user->setCoords([ $x, $y ]);
 
@@ -138,10 +134,7 @@ class MapController extends AbstractController
     #[Route('/game/recruit/{id}', name: 'game_recruit', requirements: ['id' => '\d+'])]
     public function recruit(int $id): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw new \RuntimeException(sprintf('Expected App\\Entity\\User, got %s', $user === null ? 'null' : get_class($user)));
-        }
+        $user = $this->userService->entity($this->getUser());
 
         $loner = $this->lonerRepository->find($id);
         if(!$loner){

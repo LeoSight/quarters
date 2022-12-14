@@ -45,16 +45,16 @@
 
 @for $i from 0 through 5 {
     .mt-#{$i} {
-        margin-top: #{$i/2}rem;
+        margin-top: #{calc($i/2)}rem;
     }
     .mb-#{$i} {
-        margin-bottom: #{$i/2}rem;
+        margin-bottom: #{calc($i/2)}rem;
     }
     .ml-#{$i} {
-        margin-left: #{$i/2}rem;
+        margin-left: #{calc($i/2)}rem;
     }
     .mr-#{$i} {
-        margin-right: #{$i/2}rem;
+        margin-right: #{calc($i/2)}rem;
     }
 }
 
