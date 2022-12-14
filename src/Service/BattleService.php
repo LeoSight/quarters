@@ -28,16 +28,25 @@ class BattleService {
             $users = $this->userRepository->findBy(['x' => $field['x'], 'y' => $field['y']]);
             $battle = $this->battleRepository->findOneBy(['x' => $field['x'], 'y' => $field['y']]);
             if (!$battle) {
-                // TODO: kontrola frakcí
+                $factions = [];
+                foreach($users as $user){
+                    $factions[] = $user->getFaction() ? $user->getFaction()->getId() : 0;
+                }
 
-                $battle = new Battle();
-                $battle->setX($field['x']);
-                $battle->setY($field['y']);
-                $battle->setLastSimulation(new \DateTime());
-                $this->manager->persist($battle);
+                // TODO: po přidání diplomacie kontrolovat vztah frakcí
+                $factions = array_unique($factions);
+                if(count($factions) > 1) {
+                    $battle = new Battle();
+                    $battle->setX($field['x']);
+                    $battle->setY($field['y']);
+                    $battle->setLastSimulation(new \DateTime());
+                    $this->manager->persist($battle);
+                }
             }
 
-            $activeBattles[] = $battle->getId();
+            if (!$battle) {
+                $activeBattles[] = $battle->getId();
+            }
         }
 
         $battles = $this->battleRepository->findAll();
@@ -70,8 +79,7 @@ class BattleService {
                         $enemyManpower = 0;
 
                         foreach ($users as $enemy) {
-                            // TODO: kontrola frakcí
-                            if ($enemy->getId() != $user->getId()) {
+                            if ($enemy->getFaction() !== $user->getFaction()) {
                                 $enemyManpower += count($enemy->getSoldiers());
                             }
                         }
@@ -95,6 +103,28 @@ class BattleService {
                 }
 
                 $battle->setLastSimulation(new \DateTime());
+            }
+        }
+
+        $this->manager->flush();
+
+        $this->endBattles();
+    }
+
+    public function endBattles(): void
+    {
+        $battles = $this->battleRepository->findAll();
+        foreach($battles as $battle) {
+            $users = $this->userRepository->findBy(['x' => $battle->getX(), 'y' => $battle->getY()]);
+            $factions = [];
+            foreach ($users as $user) {
+                $factions[] = $user->getFaction() ? $user->getFaction()->getId() : 0;
+            }
+
+            // TODO: po přidání diplomacie kontrolovat vztah frakcí
+            $factions = array_unique($factions);
+            if (count($factions) <= 1) {
+                $this->manager->remove($battle);
             }
         }
 

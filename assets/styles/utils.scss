@@ -11,6 +11,11 @@
     max-width: 1200px;
 }
 
+.flex {
+    display: flex;
+    align-items: center;
+}
+
 .flex-center {
     display: flex;
     align-items: center;
@@ -24,6 +29,33 @@
 .full {
     width: 100%;
     height: 100%;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+@for $i from 0 through 5 {
+    .mt-#{$i} {
+        margin-top: #{$i/2}rem;
+    }
+    .mb-#{$i} {
+        margin-bottom: #{$i/2}rem;
+    }
+    .ml-#{$i} {
+        margin-left: #{$i/2}rem;
+    }
+    .mr-#{$i} {
+        margin-right: #{$i/2}rem;
+    }
 }
 
 .button {

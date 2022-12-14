@@ -82,6 +82,17 @@ $field: #6a7a6a;
 
     svg {
         color: #fff;
+        filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+    }
+
+    .player-icon {
+        color: #fff;
+        display: block;
+        width: 3.889rem;
+
+        & > svg {
+            color: inherit;
+        }
     }
 }
 

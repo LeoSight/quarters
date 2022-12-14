@@ -34,9 +34,17 @@ class Faction
     #[ORM\OneToMany(mappedBy: 'faction', targetEntity: User::class)]
     private Collection $users;
 
+    /**
+     * @var ArrayCollection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'applications')]
+    #[ORM\JoinTable(name: "factions_applicants")]
+    private Collection $applicants;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->applicants = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -118,6 +126,30 @@ class Faction
                 $user->setFaction(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getApplicants(): Collection
+    {
+        return $this->applicants;
+    }
+
+    public function addApplicant(User $applicant): self
+    {
+        if (!$this->applicants->contains($applicant)) {
+            $this->applicants->add($applicant);
+        }
+
+        return $this;
+    }
+
+    public function removeApplicant(User $applicant): self
+    {
+        $this->applicants->removeElement($applicant);
 
         return $this;
     }
