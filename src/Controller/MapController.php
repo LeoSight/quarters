@@ -57,13 +57,37 @@ class MapController extends AbstractController
         $allPlayers = $this->userRepository->findAll();
         foreach($allPlayers as $player){
             /* @var $player User */
+
+            $movement = 'none';
+            $currentAction = $actionRepository->findUserCurrentAction($player);
+            if($currentAction !== null && $currentAction->getType() == ActionTypes::MOVE){
+                $target = json_decode($currentAction->getData() ?? '[]', true);
+                $options = [
+                    [0, -1],
+                    [-1, $player->getX() % 2 == 0 ? -1 : 0],
+                    [1, $player->getX() % 2 == 0 ? -1 : 0],
+                    [-1, $player->getX() % 2 == 0 ? 0 : 1],
+                    [1, $player->getX() % 2 == 0 ? 0 : 1],
+                    [0, 1],
+                ];
+                $movements = ['up', 'leftup', 'rightup', 'leftdown', 'rightdown', 'down'];
+
+                foreach($options as $key => $option){
+                    if($player->getX() + $option[0] == $target['x'] && $player->getY() + $option[1] == $target['y']){
+                        $movement = $movements[$key];
+                        break;
+                    }
+                }
+            }
+
             $players[] = [
                 'id' => $player->getId(),
                 'username' => $player->getUserIdentifier(),
                 'x' => $player->getX(),
                 'y' => $player->getY(),
                 'size' => count($player->getSoldiers()),
-                'faction' => $player->getFaction()
+                'faction' => $player->getFaction(),
+                'movement' => $movement
             ];
         }
 

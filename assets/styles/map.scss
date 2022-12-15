@@ -94,6 +94,46 @@ $field: #6a7a6a;
             color: inherit;
         }
     }
+
+    .movement {
+        position: absolute;
+        width: 3em;
+        height: 3em;
+        z-index: 1;
+
+        &.up {
+            top: -1.7em;
+        }
+
+        &.leftup {
+            top: 0.1em;
+            left: -2.7em;
+            transform: rotate(-58deg);
+        }
+
+        &.rightup {
+            top: 0.1em;
+            right: -2.7em;
+            transform: rotate(58deg);
+        }
+
+        &.leftdown {
+            bottom: 0.1em;
+            left: -2.7em;
+            transform: rotate(-125deg);
+        }
+
+        &.rightdown {
+            bottom: 0.1em;
+            right: -2.7em;
+            transform: rotate(125deg);
+        }
+
+        &.down {
+            bottom: -1.7em;
+            transform: rotate(180deg);
+        }
+    }
 }
 
 .squad-size {

@@ -50,7 +50,7 @@ class Loner
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
 
@@ -62,7 +62,7 @@ class Loner
         return $this->x;
     }
 
-    public function setX(int $x): self
+    public function setX(?int $x): self
     {
         $this->x = $x;
 
@@ -74,7 +74,7 @@ class Loner
         return $this->y;
     }
 
-    public function setY(int $y): self
+    public function setY(?int $y): self
     {
         $this->y = $y;
 

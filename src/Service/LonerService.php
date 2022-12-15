@@ -51,18 +51,36 @@ class LonerService {
         return $loner;
     }
 
+    public function soldierDataTransfer(Loner|Soldier $from, Loner|Soldier $to): void
+    {
+        $to->setName($from->getName());
+        $to->setRole($from->getRole());
+        $to->setHealth($from->getHealth());
+        $to->setExperience($from->getExperience());
+        $to->setWeapon($from->getWeapon());
+        $to->setInjuries($from->getInjuries());
+    }
+
     public function assignLonerToUser(Loner $loner, User $user): void
     {
         $soldier = new Soldier();
         $soldier->setUser($user);
-        $soldier->setName($loner->getName());
-        $soldier->setRole($loner->getRole());
-        $soldier->setHealth($loner->getHealth());
-        $soldier->setExperience($loner->getExperience());
-        $soldier->setWeapon($loner->getWeapon());
+        $this->soldierDataTransfer($loner, $soldier);
 
         $this->manager->persist($soldier);
         $this->manager->remove($loner);
+        $this->manager->flush();
+    }
+
+    public function freeSoldierFromUser(Soldier $soldier, User $user): void
+    {
+        $loner = new Loner();
+        $loner->setX($user->getX());
+        $loner->setY($user->getY());
+        $this->soldierDataTransfer($soldier, $loner);
+
+        $this->manager->persist($loner);
+        $this->manager->remove($soldier);
         $this->manager->flush();
     }
 
