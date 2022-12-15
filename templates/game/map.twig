@@ -9,11 +9,13 @@
         <div class="location">
             <p>Zpravodajské informace jsou aktuální k času {{ 'now' | date('H:i') }}</p>
             <p>Právě se nacházíš na souřadnicích: <strong>{{ x }},{{ y }}</strong></p>
+
             {% for battle in battles %}
                 {% if battle.x == x and battle.y == y %}
                     <p class="red">Právě zde probíhá bitva!</p>
                 {% endif %}
             {% endfor %}
+
             <p>Na tomto poli se nachází tito hráči:</p>
             <ul>
                 {% for player in players %}
@@ -26,6 +28,7 @@
                     {% endif %}
                 {% endfor %}
             </ul>
+
             {% if loners is not empty %}
                 <p>Na tomto poli se nachází odpadlíci:</p>
                 <ul>
@@ -34,20 +37,35 @@
                     {% endfor %}
                 </ul>
             {% endif %}
+
             {% if busy %}
                 <p class="red">Tvá jednotka právě plní rozkaz, bude zaneprázdněná až do {{ busy }}</p>
                 {% if current and current.type == 1 %}
                     <p class="red">Právě probíhá přesun na souřadnice {{ current.data.x }},{{ current.data.y }}</p>
                 {% endif %}
             {% endif %}
+
             {% if location.town is not null %}
                 <h2 class="mt-2">{{ location.town.title|upper }}</h2>
                 {% if location.town.owner is not null %}
-                    <p>Toto město vlastní <strong style="color:#{{ location.town.owner.color }};">{{ location.town.owner.title }}</strong>.</p>
+                    <p>Toto město ovládá <strong style="color:#{{ location.town.owner.color }};">{{ location.town.owner.title }}</strong>.</p>
                 {% else %}
-                    <p>Toto město nikdo nevlastní!</p>
+                    <p>Toto město nikdo neovládá!</p>
                 {% endif %}
-                <a href="/game/map/capture">Obsadit město</a>
+
+                {% if user.faction is not null and user.faction != location.town.owner %}
+                    {% set enemySize = 0 %}
+                    {% for player in players %}
+                        {% if player.x == x and player.y == y %}
+                            {% if player.faction != user.faction %}
+                                {% set enemySize = enemySize + player.soldiers|length %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if enemySize == 0 %}
+                        <a href="/game/map/capture">Obsadit město</a>
+                    {% endif %}
+                {% endif %}
             {% endif %}
         </div>
         <div class="map">

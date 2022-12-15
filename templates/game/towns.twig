@@ -1,0 +1,16 @@
+{% extends "layout.twig" %}
+
+{% block header %}
+    <h1>MĚSTA</h1>
+{% endblock %}
+
+{% block main %}
+    {% for town in towns %}
+        <h2 class="mt-2">{{ town.title|upper }} [{{ town.x }},{{ town.y }}]</h2>
+        {% if town.owner is not null %}
+            <p>Toto město ovládá <strong style="color:#{{ town.owner.color }};">{{ town.owner.title }}</strong>.</p>
+        {% else %}
+            <p>Toto město nikdo neovládá!</p>
+        {% endif %}
+    {% endfor %}
+{% endblock %}
