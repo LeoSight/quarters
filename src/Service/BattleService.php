@@ -95,8 +95,6 @@ class BattleService {
                             $unfortunate->setHealth($unfortunate->getHealth() - rand(15, 70));
                             if ($unfortunate->getHealth() <= 0) {
                                 $this->manager->remove($unfortunate);
-                            } else {
-                                $this->manager->persist($unfortunate);
                             }
                         }
                     }

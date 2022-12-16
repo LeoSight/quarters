@@ -18,6 +18,7 @@ class LonerService {
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly ManagerRegistry $doctrine,
+        private readonly UtilsService $utilsService
     ) {
         $this->manager = $this->doctrine->getManager();
     }
@@ -40,9 +41,24 @@ class LonerService {
         $loner->setName($faker->firstName($gender) . ' ' . $faker->lastName($gender));
         $loner->setX($x);
         $loner->setY($y);
-        $loner->setRole(SoldierRoles::CITIZEN);
+
+        $loner->setRole(
+            SoldierRoles::from(
+                $this->utilsService->getRandomWeightedElement([
+                    SoldierRoles::CITIZEN->value => 5,
+                    SoldierRoles::RIFLEMAN->value => 2,
+                    SoldierRoles::MEDIC->value => 1,
+                ])
+            )
+        );
+
         $loner->setHealth(100);
+
         $loner->setExperience(0);
+        if($loner->getRole() != SoldierRoles::CITIZEN){
+            $loner->setExperience(rand(0,70));
+        }
+
         $loner->setWeapon(0);
 
         $this->manager->persist($loner);

@@ -11,4 +11,9 @@ class SquadService {
         return count($user->getSoldiers()) * 30;
     }
 
+    public function getFirePower(User $user): int
+    {
+        return count($user->getSoldiers());
+    }
+
 }

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Model\ItemInterface;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -54,11 +55,18 @@ class User implements UserInterface
     #[ORM\JoinTable(name: "factions_applicants")]
     private Collection $applications;
 
+    /**
+     * @var ArrayCollection<int, ItemInterface>
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Item::class)]
+    private Collection $items;
+
     public function __construct()
     {
         $this->soldiers = new ArrayCollection();
         $this->actions = new ArrayCollection();
         $this->applications = new ArrayCollection();
+        $this->items = new ArrayCollection();
     }
 
     /*
@@ -309,6 +317,36 @@ class User implements UserInterface
             $faction->removeApplicant($this);
             return true;
         });
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Item>
+     */
+    public function getItems(): Collection
+    {
+        return $this->items;
+    }
+
+    public function addItem(Item $item): self
+    {
+        if (!$this->items->contains($item)) {
+            $this->items->add($item);
+            $item->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeItem(Item $item): self
+    {
+        if ($this->items->removeElement($item)) {
+            // set the owning side to null (unless already changed)
+            if ($item->getUser() === $this) {
+                $item->setUser(null);
+            }
+        }
 
         return $this;
     }
