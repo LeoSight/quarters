@@ -56,10 +56,16 @@ class User implements UserInterface
     private Collection $applications;
 
     /**
-     * @var ArrayCollection<int, ItemInterface>
+     * @var ArrayCollection<int, Item>
      */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Item::class)]
     private Collection $items;
+
+    #[ORM\Column(options: ["default" => 0])]
+    private int $kills = 0;
+
+    #[ORM\Column(options: ["default" => 0])]
+    private int $deaths = 0;
 
     public function __construct()
     {
@@ -347,6 +353,30 @@ class User implements UserInterface
                 $item->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getKills(): ?int
+    {
+        return $this->kills;
+    }
+
+    public function setKills(int $kills): self
+    {
+        $this->kills = $kills;
+
+        return $this;
+    }
+
+    public function getDeaths(): ?int
+    {
+        return $this->deaths;
+    }
+
+    public function setDeaths(int $deaths): self
+    {
+        $this->deaths = $deaths;
 
         return $this;
     }

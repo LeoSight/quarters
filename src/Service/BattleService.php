@@ -77,10 +77,12 @@ class BattleService {
                     foreach ($users as $user) {
                         $manpower = count($user->getSoldiers());
                         $enemyManpower = 0;
+                        $enemies = [];
 
                         foreach ($users as $enemy) {
                             if ($enemy->getFaction() !== $user->getFaction()) {
                                 $enemyManpower += count($enemy->getSoldiers());
+                                $enemies[] = $enemy;
                             }
                         }
 
@@ -95,6 +97,11 @@ class BattleService {
                             $unfortunate->setHealth($unfortunate->getHealth() - rand(15, 70));
                             if ($unfortunate->getHealth() <= 0) {
                                 $this->manager->remove($unfortunate);
+
+                                // prozatím random
+                                $randomEnemy = $enemies[array_rand($enemies)];
+                                $randomEnemy->setKills($randomEnemy->getKills() + 1);
+                                $user->setDeaths($user->getDeaths() + 1);
                             }
                         }
                     }

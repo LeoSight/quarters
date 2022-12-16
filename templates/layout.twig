@@ -11,6 +11,8 @@
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
+        {% block head %}
+        {% endblock %}
     </head>
     <body>
         {% for flashMessage in app.session.flashbag.get('notice') %}
