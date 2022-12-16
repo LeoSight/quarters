@@ -44,7 +44,7 @@ class MapController extends AbstractController
         $current = null;
 
         if($user->getBusyTill() != null) {
-            $busy = $user->getBusyTill() > new \DateTime() ? $user->getBusyTill()->format('H:i') : null;
+            $busy = $user->getBusyTill() > new \DateTime() ? $user->getBusyTill()->diff(new \DateTime())->format('%I:%S') : null;
         }
 
         // dočasná hovadinka, která se později zcela nahradí
