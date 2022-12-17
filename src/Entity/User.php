@@ -6,6 +6,7 @@ use App\Model\ItemInterface;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -67,12 +68,19 @@ class User implements UserInterface
     #[ORM\Column(options: ["default" => 0])]
     private int $deaths = 0;
 
+    /**
+     * @var ArrayCollection<int, Notification>
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notification::class, orphanRemoval: true)]
+    private Collection $notifications;
+
     public function __construct()
     {
         $this->soldiers = new ArrayCollection();
         $this->actions = new ArrayCollection();
         $this->applications = new ArrayCollection();
         $this->items = new ArrayCollection();
+        $this->notifications = new ArrayCollection();
     }
 
     /*
@@ -377,6 +385,38 @@ class User implements UserInterface
     public function setDeaths(int $deaths): self
     {
         $this->deaths = $deaths;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Notification>
+     */
+    public function getNotifications(): Collection
+    {
+        $criteria = Criteria::create()->orderBy(["created" => Criteria::DESC]);
+
+        return $this->notifications->matching($criteria);
+    }
+
+    public function addNotification(Notification $notification): self
+    {
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications->add($notification);
+            $notification->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNotification(Notification $notification): self
+    {
+        if ($this->notifications->removeElement($notification)) {
+            // set the owning side to null (unless already changed)
+            if ($notification->getUser() === $this) {
+                $notification->setUser(null);
+            }
+        }
 
         return $this;
     }

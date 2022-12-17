@@ -85,4 +85,12 @@ class InjuryService {
         return str_replace(array_keys($replace), array_values($replace), $injury);
     }
 
+    /**
+     * @return array
+     */
+    public function getBodyParts(): array
+    {
+        return $this->bodyParts;
+    }
+
 }

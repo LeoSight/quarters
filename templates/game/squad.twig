@@ -8,7 +8,9 @@
     <p>Počet členů: {{ soldiers|length }}</p>
 
     {{ include('parts/busy.twig') }}
-    {% if busy is null %}
+    {% if battle %}
+        <p class="red">Právě probíhá bitva!</p>
+    {% elseif busy is null %}
         <p>Akce: <a href="/game/squad/rest">Zahájit odpočinek (5m)</a></p>
     {% endif %}
 

@@ -66,3 +66,31 @@ button {
     align-items: center;
     justify-content: center;
 }
+
+.notification {
+    background: #285896;
+    border: 0.25rem solid #143b67;
+    margin: 0.5rem 0;
+    display: flex;
+
+    .time {
+        background: #143b67;
+        width: 12rem;
+        flex: 0 0 12rem;
+        text-align: center;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .message {
+        margin: 0.25rem 0.5rem;
+    }
+
+    &.alert {
+        background: #832735;
+        border-color: #601721;
+
+        .time {
+            background: #601721;
+        }
+    }
+}
