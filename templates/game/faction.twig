@@ -22,9 +22,11 @@
                     {% endif %}
                     {{ m.username }}
                     ({{ m.soldiers|length }})
+                    [{{ m.x }},{{ m.y }}]
                 </p>
             {% endfor %}
         </div>
+
         {% if faction.leader == me %}
             {% if applicants|length > 0 %}
                 <p class="mt-3">Žadatelé o vstup do frakce:</p>
@@ -45,16 +47,19 @@
         {% else %}
             <p class="mt-3"><a class="button" href="/game/faction/leave">Opustit frakci</a></p>
         {% endif %}
-        <p class="mt-3">Další frakce:</p>
-        <div>
-            {% for f in factions %}
-                {% if f.id != faction.id %}
-                    <p class="flex" style="color:#{{ faction.color }};">
-                        {{ f.title }}
-                    </p>
-                {% endif %}
-            {% endfor %}
-        </div>
+
+        {% if factions|length > 0 %}
+            <p class="mt-3">Další frakce:</p>
+            <div>
+                {% for f in factions %}
+                    {% if f.id != faction.id %}
+                        <p class="flex" style="color:#{{ faction.color }};">
+                            {{ f.title }}
+                        </p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
     {% else %}
         <p class="mb-5">Nejsi členem žádné frakce.</p>
         <p>Můžeš požádat o připojení k frakci:</p>

@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Action;
 use App\Enum\ActionStates;
 use App\Enum\ActionTypes;
+use App\Enum\SoldierRoles;
 use App\Model\MoveAction;
 use App\Repository\ActionRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -50,10 +51,17 @@ class ActionService {
     public function runAction(Action $action): void
     {
         // TODO: až budeme v budoucnu přidávat více časovaných akcí, bude to tu nutné překopat
-        if($action->getType() != ActionTypes::MOVE){
+        if($action->getType() == ActionTypes::MOVE){
+            $this->runActionMove($action);
+        }elseif($action->getType() == ActionTypes::REST){
+            $this->runActionRest($action);
+        }else{
             throw new \RuntimeException("It's middleware time! 💀");
         }
+    }
 
+    public function runActionMove(Action $action): void
+    {
         $user = $action->getUser();
         if(!$user){
             throw new \RuntimeException("Move action needs user!");
@@ -70,11 +78,31 @@ class ActionService {
         $user->setCoords([ $data->getX(), $data->getY() ]);
         $action->setStatus(ActionStates::DONE);
 
-        $this->manager->persist($action);
-        $this->manager->persist($user);
         $this->manager->flush();
 
         $this->battleService->startBattles();
+    }
+
+    public function runActionRest(Action $action): void
+    {
+        $user = $action->getUser();
+        if(!$user){
+            throw new \RuntimeException("Rest action needs user!");
+        }
+
+        $soldiers = $user->getSoldiers();
+        $medics = count($soldiers->filter(function($soldier){ return $soldier->getRole() == SoldierRoles::MEDIC; }));
+
+        foreach($soldiers as $soldier){
+            if($soldier->getHealth() < 100 || count($soldier->getInjuries() ?? []) > 0){
+                $soldier->setHealth(min(100, $soldier->getHealth() + rand(1,3) * (1 + $medics)));
+                $soldier->setInjuries(null);
+            }
+        }
+
+        $action->setStatus(ActionStates::DONE);
+
+        $this->manager->flush();
     }
 
 }
