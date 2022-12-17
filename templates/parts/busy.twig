@@ -1,6 +1,6 @@
 {% if busy %}
     <div class="busy">
-        <p class="red">Tvá jednotka právě plní rozkaz, bude zaneprázdněná až do {{ busy }}</p>
+        <p class="red">Tvá jednotka právě plní rozkaz, bude zaneprázdněná ještě <span class="busy-time" data-end-at="{{ busy|date("U") }}"></span></p>
         {% if current %}
             {% if current.type.value == 1 %}
                 <p class="yellow">Právě probíhá přesun na souřadnice {{ current.data.x }},{{ current.data.y }}</p>
@@ -9,4 +9,38 @@
             {% endif %}
         {% endif %}
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var busyTime = document.querySelector('.busy-time');
+            const busyTimeEnd = busyTime.dataset.endAt;
+
+            const actualTime = new Date().getTime() / 1000;
+            if(busyTimeEnd > actualTime) {
+                updateTime(busyTimeEnd);
+                setInterval(updateTime, 1000, busyTimeEnd);
+            }else{
+                location.reload();
+            }
+        });
+
+        function updateTime(busyTimeEnd)
+        {
+            var busyTime = document.querySelector('.busy-time');
+            const actualTime = new Date().getTime() / 1000;
+            var seconds = Math.max(0, Math.floor(busyTimeEnd - actualTime));
+            let minutes = 0;
+
+            while(seconds > 59){
+                seconds = seconds - 60;
+                minutes++;
+            }
+            const formateText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            busyTime.innerHTML = formateText;
+
+            if(minutes == 0 && seconds < 1) return setTimeout(function () {
+                location.reload();
+            }, 2000);
+        }
+    </script>
 {% endif %}

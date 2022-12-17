@@ -37,7 +37,7 @@ class SquadController extends AbstractController
         $current = null;
 
         if($user->getBusyTill() != null) {
-            $busy = $user->getBusyTill() > new \DateTime() ? $user->getBusyTill()->format('H:i') : null;
+            $busy = $user->getBusyTill() > new \DateTime() ? $user->getBusyTill() : null;
         }
 
         $currentAction = $this->actionRepository->findUserCurrentAction($user);
