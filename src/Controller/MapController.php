@@ -168,7 +168,7 @@ class MapController extends AbstractController
         $action = new Action();
         $action->setUser($user);
         $action->setType(ActionTypes::MOVE);
-        $action->setRunTime(new \DateTime('1 minute'));
+        $action->setRunTime(new \DateTime('2 minute'));
         $action->setData([ 'x' => $x, 'y' => $y ]);
 
         $this->doctrine->getManager()->persist($action);

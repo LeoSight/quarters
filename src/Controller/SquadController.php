@@ -82,7 +82,7 @@ class SquadController extends AbstractController
         $action = new Action();
         $action->setUser($user);
         $action->setType(ActionTypes::REST);
-        $action->setRunTime(new \DateTime('4 minute'));
+        $action->setRunTime(new \DateTime('5 minute'));
 
         $this->doctrine->getManager()->persist($action);
         $this->doctrine->getManager()->flush();
