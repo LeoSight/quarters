@@ -26,10 +26,10 @@ class Soldier
     private ?SoldierRoles $role = SoldierRoles::CITIZEN;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $health = 100;
+    private int $health = 100;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $experience = 0;
+    private int $experience = 0;
 
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $weapon = 0;
@@ -78,24 +78,24 @@ class Soldier
         return $this;
     }
 
-    public function getHealth(): ?int
+    public function getHealth(): int
     {
         return $this->health;
     }
 
-    public function setHealth(?int $health): self
+    public function setHealth(int $health): self
     {
         $this->health = $health;
 
         return $this;
     }
 
-    public function getExperience(): ?int
+    public function getExperience(): int
     {
         return $this->experience;
     }
 
-    public function setExperience(?int $experience): self
+    public function setExperience(int $experience): self
     {
         $this->experience = $experience;
 

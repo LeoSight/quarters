@@ -31,13 +31,13 @@ class FactionController extends AbstractController
 
         $myFaction = $user->getFaction();
         $twigArgs = [ 'me' => $user, 'faction' => $myFaction ];
+        $twigArgs['factions'] = $this->factionRepository->findAll();
 
         if($myFaction){
             $twigArgs['applicants'] = $myFaction->getApplicants();
         }else{
             $twigArgs['soldiers'] = count($user->getSoldiers());
             $twigArgs['applications'] = $user->getApplications()->map(function($obj){return $obj->getId();})->getValues();
-            $twigArgs['factions'] = $this->factionRepository->findAll();
         }
 
         return $this->render('game/faction.twig', $twigArgs);

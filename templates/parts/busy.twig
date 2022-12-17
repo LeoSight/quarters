@@ -1,0 +1,12 @@
+{% if busy %}
+    <div class="busy">
+        <p class="red">Tvá jednotka právě plní rozkaz, bude zaneprázdněná až do {{ busy }}</p>
+        {% if current %}
+            {% if current.type.value == 1 %}
+                <p class="yellow">Právě probíhá přesun na souřadnice {{ current.data.x }},{{ current.data.y }}</p>
+            {% elseif current.type.value == 2 %}
+                <p class="yellow">Právě probíhá odpočinek</p>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endif %}

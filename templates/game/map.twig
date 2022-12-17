@@ -1,5 +1,9 @@
 {% extends "layout.twig" %}
 
+{% block head %}
+    <meta http-equiv="refresh" content="125">
+{% endblock %}
+
 {% block header %}
     <h1>MAPA</h1>
 {% endblock %}
@@ -38,12 +42,7 @@
                 </ul>
             {% endif %}
 
-            {% if busy %}
-                <p class="red">Tvá jednotka právě plní rozkaz, bude zaneprázdněná až do {{ busy }}</p>
-                {% if current and current.type == 1 %}
-                    <p class="red">Právě probíhá přesun na souřadnice {{ current.data.x }},{{ current.data.y }}</p>
-                {% endif %}
-            {% endif %}
+            {{ include('parts/busy.twig') }}
 
             {% if location.town is not null %}
                 <h2 class="mt-2">{{ location.town.title|upper }}</h2>

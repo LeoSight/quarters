@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
+use App\Model\ItemInterface;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -54,11 +56,31 @@ class User implements UserInterface
     #[ORM\JoinTable(name: "factions_applicants")]
     private Collection $applications;
 
+    /**
+     * @var ArrayCollection<int, Item>
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Item::class)]
+    private Collection $items;
+
+    #[ORM\Column(options: ["default" => 0])]
+    private int $kills = 0;
+
+    #[ORM\Column(options: ["default" => 0])]
+    private int $deaths = 0;
+
+    /**
+     * @var ArrayCollection<int, Notification>
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notification::class, orphanRemoval: true)]
+    private Collection $notifications;
+
     public function __construct()
     {
         $this->soldiers = new ArrayCollection();
         $this->actions = new ArrayCollection();
         $this->applications = new ArrayCollection();
+        $this->items = new ArrayCollection();
+        $this->notifications = new ArrayCollection();
     }
 
     /*
@@ -309,6 +331,92 @@ class User implements UserInterface
             $faction->removeApplicant($this);
             return true;
         });
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Item>
+     */
+    public function getItems(): Collection
+    {
+        return $this->items;
+    }
+
+    public function addItem(Item $item): self
+    {
+        if (!$this->items->contains($item)) {
+            $this->items->add($item);
+            $item->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeItem(Item $item): self
+    {
+        if ($this->items->removeElement($item)) {
+            // set the owning side to null (unless already changed)
+            if ($item->getUser() === $this) {
+                $item->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getKills(): ?int
+    {
+        return $this->kills;
+    }
+
+    public function setKills(int $kills): self
+    {
+        $this->kills = $kills;
+
+        return $this;
+    }
+
+    public function getDeaths(): ?int
+    {
+        return $this->deaths;
+    }
+
+    public function setDeaths(int $deaths): self
+    {
+        $this->deaths = $deaths;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Notification>
+     */
+    public function getNotifications(): Collection
+    {
+        $criteria = Criteria::create()->orderBy(["created" => Criteria::DESC]);
+
+        return $this->notifications->matching($criteria);
+    }
+
+    public function addNotification(Notification $notification): self
+    {
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications->add($notification);
+            $notification->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNotification(Notification $notification): self
+    {
+        if ($this->notifications->removeElement($notification)) {
+            // set the owning side to null (unless already changed)
+            if ($notification->getUser() === $this) {
+                $notification->setUser(null);
+            }
+        }
 
         return $this;
     }

@@ -5,5 +5,14 @@
 {% endblock %}
 
 {% block main %}
-    abcd
+    {% for notification in notifications %}
+        <div class="notification {{ notification.type.name|lower }}">
+            <div class="time">
+                {{ notification.created|date("d.m.Y H:i") }}
+            </div>
+            <div class="message">
+                {{ notification.message|raw }}
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}
