@@ -1,0 +1,35 @@
+{% if location.town is not null %}
+    <h2 class="mt-2">{{ location.town.title|upper }}</h2>
+    {% if location.town.owner is not null %}
+        <p>Toto město ovládá <strong style="color:#{{ location.town.owner.color }};">{{ location.town.owner.title }}</strong>.</p>
+    {% else %}
+        <p>Toto město nikdo neovládá!</p>
+    {% endif %}
+
+    {% if user.faction is not null %}
+        {% if location.town.production is not null %}
+            <p>Toto město produkuje <strong>{{ items[location.town.production].name }}.</strong></p>
+        {% endif %}
+
+        {% if user.faction == location.town.owner %}
+            <p class="mt-2">Nastavení produkce:</p>
+            {% for item in items %}
+                {% if item.productionTime > 0 %}
+                    <p><a href="/game/map/produce/{{ item.id }}">{{ item.name }} (1x/{{ item.productionTime }}m)</a></p>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            {% set enemySize = 0 %}
+            {% for player in players %}
+                {% if player.x == x and player.y == y %}
+                    {% if player.faction != user.faction %}
+                        {% set enemySize = enemySize + player.soldiers|length %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% if enemySize == 0 %}
+                <a href="/game/map/capture">Obsadit město</a>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endif %}

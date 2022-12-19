@@ -3,16 +3,20 @@
 namespace App\Controller;
 
 use App\Entity\Action;
+use App\Entity\Item;
 use App\Entity\User;
 use App\Enum\ActionTypes;
 use App\Enum\FieldTypes;
 use App\Repository\ActionRepository;
 use App\Repository\BattleRepository;
 use App\Repository\FieldRepository;
+use App\Repository\ItemRepository;
 use App\Repository\LonerRepository;
 use App\Repository\TownRepository;
 use App\Repository\UserRepository;
+use App\Service\ItemService;
 use App\Service\LonerService;
+use App\Service\ProductionService;
 use App\Service\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,7 +31,10 @@ class MapController extends AbstractController
         private readonly BattleRepository $battleRepository,
         private readonly FieldRepository $fieldRepository,
         private readonly TownRepository $townRepository,
+        private readonly ItemRepository $itemRepository,
+        private readonly ProductionService $productionService,
         private readonly LonerService $lonerService,
+        private readonly ItemService $itemService,
         private readonly UserService $userService,
         private readonly ManagerRegistry $doctrine
     ) {}
@@ -99,6 +106,7 @@ class MapController extends AbstractController
 
         $battles = $this->battleRepository->findAll();
         $towns = $this->townRepository->findAll();
+        $items = $this->itemService->getAllItems();
 
         $fields = [];
         $allFields = $this->fieldRepository->findAll();
@@ -106,8 +114,16 @@ class MapController extends AbstractController
             $fields[] = [ 'x' => $field->getX(), 'y' => $field->getY(), 'type' => $field->getType()->value ];
         }
 
+        $town = $this->townRepository->findOneBy([ 'x' => $x, 'y' => $y ]);
+        if($town){
+            $this->productionService->produce($town);
+        }
+
+        $locationItems = $this->itemRepository->findBy([ 'x' => $x, 'y' => $y ]);
+
         $location = [
-            'town' => $this->townRepository->findOneBy([ 'x' => $x, 'y' => $y ])
+            'town' => $town,
+            'items' => $locationItems
         ];
 
         return $this->render('game/map.twig', [
@@ -121,7 +137,8 @@ class MapController extends AbstractController
             'towns' => $towns,
             'busy' => $busy,
             'current' => $current,
-            'user' => $user
+            'user' => $user,
+            'items' => $items
         ]);
     }
 
@@ -225,7 +242,80 @@ class MapController extends AbstractController
 
         $town->setOwner($user->getFaction());
 
-        $this->doctrine->getManager()->persist($town);
+        $this->doctrine->getManager()->flush();
+
+        return $this->redirectToRoute('game_map');
+    }
+
+    #[Route('/game/map/produce/{id}', name: 'game_map_produce', requirements: ['id' => '\d+'])]
+    public function produce(int $id): Response
+    {
+        $user = $this->userService->entity($this->getUser());
+
+        if(!$user->getFaction()){
+            return $this->redirectToRoute('game_map');
+        }
+
+        $town = $this->townRepository->findOneBy([ 'x' => $user->getX(), 'y' => $user->getY() ]);
+        if(!$town || $town->getOwner() !== $user->getFaction()){
+            return $this->redirectToRoute('game_map');
+        }
+
+        $item = $this->itemService->getItem($id);
+        if(!$item || $item->getProductionTime() == 0){
+            return $this->redirectToRoute('game_map');
+        }
+
+        $town->setProduction($id);
+        $town->setLastProduced(new \DateTime());
+
+        $this->doctrine->getManager()->flush();
+
+        return $this->redirectToRoute('game_map');
+    }
+
+    #[Route('/game/map/pickup/{id}/{amount}', name: 'game_map_pickup', requirements: ['id' => '\d+', 'amount' => '\d+'])]
+    public function pickup(int $id, int $amount): Response
+    {
+        $user = $this->userService->entity($this->getUser());
+
+        $item = $this->itemRepository->find($id);
+        if(!$item || $item->getX() !== $user->getX() || $item->getY() !== $user->getY()){
+            return $this->redirectToRoute('game_map');
+        }
+
+        $itemData = $this->itemService->getItem($item->getItemId());
+        if(!$itemData){
+            return $this->redirectToRoute('game_map');
+        }
+
+        if($item->getQuantity() < $amount){
+            return $this->redirectToRoute('game_map');
+        }
+
+        if($item->getQuantity() == $amount){
+            $item->setUser($user)->setX(null)->setY(null);
+
+            if($itemData->isStackable()){
+                $existing = $this->itemRepository->findOneBy([ 'user' => $user, 'itemId' => $item->getItemId() ]);
+                if($existing){
+                    $existing->setQuantity($existing->getQuantity() + $amount);
+                    $this->doctrine->getManager()->remove($item);
+                }
+            }
+        }elseif($itemData->isStackable()){
+            $item->setQuantity($item->getQuantity() - $amount);
+
+            $existing = $this->itemRepository->findOneBy([ 'user' => $user, 'itemId' => $item->getItemId() ]);
+            if($existing){
+                $existing->setQuantity($existing->getQuantity() + $amount);
+            }else{
+                $newItem = new Item();
+                $newItem->setItemId($item->getItemId())->setUser($user);
+                $this->doctrine->getManager()->persist($newItem);
+            }
+        }
+
         $this->doctrine->getManager()->flush();
 
         return $this->redirectToRoute('game_map');
