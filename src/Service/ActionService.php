@@ -3,11 +3,16 @@
 namespace App\Service;
 
 use App\Entity\Action;
+use App\Entity\Item;
+use App\Entity\Soldier;
 use App\Enum\ActionStates;
 use App\Enum\ActionTypes;
 use App\Enum\SoldierRoles;
 use App\Model\MoveAction;
 use App\Repository\ActionRepository;
+use App\Repository\ItemRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -21,6 +26,8 @@ class ActionService {
 
     public function __construct(
         private readonly ActionRepository $actionRepository,
+        private readonly ItemRepository $itemRepository,
+        private readonly ItemService $itemService,
         private readonly LonerService $lonerService,
         private readonly BattleService $battleService,
         private readonly ManagerRegistry $doctrine
@@ -91,13 +98,31 @@ class ActionService {
         }
 
         $soldiers = $user->getSoldiers();
-        $medics = count($soldiers->filter(function($soldier){ return $soldier->getRole() == SoldierRoles::MEDIC; }));
+        $injured = $soldiers->filter(function(Soldier $soldier){ return $soldier->getHealth() < 100 || count($soldier->getInjuries() ?? []) > 0; });
 
-        foreach($soldiers as $soldier){
-            if($soldier->getHealth() < 100 || count($soldier->getInjuries() ?? []) > 0){
-                $soldier->setHealth(min(100, $soldier->getHealth() + rand(1,3) * (1 + $medics)));
-                $soldier->setInjuries(null);
+        $criteria = Criteria::create()->orderBy(["health" => Criteria::ASC]);
+        $injured = (new ArrayCollection($injured->toArray()))->matching($criteria);
+
+        $medics = count($soldiers->filter(function($soldier){ return $soldier->getRole() == SoldierRoles::MEDIC; }));
+        $healPower = $medics * 30;
+
+        $medKits = $this->itemRepository->findOneBy([ 'user' => $user, 'itemId' => 1 ]);
+
+        foreach($injured as $soldier){
+            $heal = rand(1,3);
+            if ($healPower > 0) {
+                $heal = min($healPower, 100 - $soldier->getHealth());
+                if($heal > 20){
+                    if (!$medKits || !$this->itemService->deplete($medKits)) {
+                        $heal = rand(1,5);
+                    }
+                }
+
+                $healPower -= $heal;
             }
+
+            $soldier->setHealth(min(100, $soldier->getHealth() + $heal));
+            $soldier->setInjuries(null);
         }
 
         $action->setStatus(ActionStates::DONE);

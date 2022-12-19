@@ -53,7 +53,7 @@
             <div>
                 {% for f in factions %}
                     {% if f.id != faction.id %}
-                        <p class="flex" style="color:#{{ faction.color }};">
+                        <p class="flex" style="color:#{{ f.color }};">
                             {{ f.title }}
                         </p>
                     {% endif %}

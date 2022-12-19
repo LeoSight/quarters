@@ -27,9 +27,17 @@ class ItemService {
         $this->fillItemDictionary();
     }
 
-    public function getItem(int $id): ItemInterface
+    public function getItem(int $id): ?ItemInterface
     {
-        return $this->dictionary[$id];
+        return $this->dictionary[$id] ?? null;
+    }
+
+    /**
+     * @return array<int, ItemInterface>
+     */
+    public function getAllItems(): array
+    {
+        return $this->dictionary;
     }
 
     public function deplete(Item $item, ?int $quantity = 1): bool
@@ -52,50 +60,59 @@ class ItemService {
     public function fillItemDictionary(): void
     {
         $item = new GenericItem();
+        $item->setId(1);
         $item->setName("Zdravotnický materiál");
         $item->setWeight(0.2);
         $item->setStackable(true);
+        $item->setProductionTime(30);
         $this->dictionary[1] = $item;
 
         // MUNICE
 
         $item = new Ammo();
+        $item->setId(2);
         $item->setName("Munice 7.62×39mm");
         $item->setWeight(0.024);
         $item->setStackable(true);
         $this->dictionary[2] = $item;
 
         $item = new Ammo();
+        $item->setId(3);
         $item->setName("Munice 7.62×51mm");
         $item->setWeight(0.034);
         $item->setStackable(true);
         $this->dictionary[3] = $item;
 
         $item = new Ammo();
+        $item->setId(4);
         $item->setName("Munice 5.56×45mm");
         $item->setWeight(0.016);
         $item->setStackable(true);
         $this->dictionary[4] = $item;
 
         $item = new Ammo();
+        $item->setId(5);
         $item->setName("Munice 12 Gauge");
         $item->setWeight(0.045);
         $item->setStackable(true);
         $this->dictionary[5] = $item;
 
         $item = new Ammo();
+        $item->setId(6);
         $item->setName("Munice .22 Long Rifle");
         $item->setWeight(0.01);
         $item->setStackable(true);
         $this->dictionary[6] = $item;
 
         $item = new Ammo();
+        $item->setId(7);
         $item->setName("Munice 9×19mm");
         $item->setWeight(0.014);
         $item->setStackable(true);
         $this->dictionary[7] = $item;
 
         $item = new Ammo();
+        $item->setId(8);
         $item->setName("Munice .45 ACP");
         $item->setWeight(0.027);
         $item->setStackable(true);
@@ -104,6 +121,7 @@ class ItemService {
         // ZBRANĚ
 
         $item = new Weapon();
+        $item->setId(9);
         $item->setName("AK-47");
         $item->setWeight(3.5);
         $item->setAccuracy(0.35);
@@ -113,6 +131,7 @@ class ItemService {
         $this->dictionary[9] = $item;
 
         $item = new Weapon();
+        $item->setId(10);
         $item->setName("H&K G3");
         $item->setWeight(4.5);
         $item->setAccuracy(0.4);

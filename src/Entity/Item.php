@@ -15,10 +15,10 @@ class Item
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $itemId = null;
+    private int $itemId;
 
     #[ORM\Column]
-    private ?int $quantity = null;
+    private int $quantity = 1;
 
     #[ORM\ManyToOne(inversedBy: 'items')]
     private ?User $user = null;
@@ -34,7 +34,7 @@ class Item
         return $this->id;
     }
 
-    public function getItemId(): ?int
+    public function getItemId(): int
     {
         return $this->itemId;
     }
@@ -46,7 +46,7 @@ class Item
         return $this;
     }
 
-    public function getQuantity(): ?int
+    public function getQuantity(): int
     {
         return $this->quantity;
     }

@@ -1,0 +1,6 @@
+{% if location.items|length > 0 %}
+    <p class="mt-2">Na této lokací se nachází předměty:</p>
+    {% for item in location.items %}
+        <p>{{ item.quantity }}x {{ items[item.itemId].name }} <a href="/game/map/pickup/{{ item.id }}/1">Vzít</a></p>
+    {% endfor %}
+{% endif %}

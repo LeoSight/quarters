@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TownRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TownRepository::class)]
@@ -25,6 +26,12 @@ class Town
 
     #[ORM\ManyToOne(inversedBy: 'towns')]
     private ?Faction $owner = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $production = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $lastProduced = null;
 
     public function getId(): ?int
     {
@@ -75,6 +82,30 @@ class Town
     public function setOwner(?Faction $owner): self
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    public function getProduction(): ?int
+    {
+        return $this->production;
+    }
+
+    public function setProduction(?int $production): self
+    {
+        $this->production = $production;
+
+        return $this;
+    }
+
+    public function getLastProduced(): ?\DateTimeInterface
+    {
+        return $this->lastProduced;
+    }
+
+    public function setLastProduced(?\DateTimeInterface $lastProduced): self
+    {
+        $this->lastProduced = $lastProduced;
 
         return $this;
     }
