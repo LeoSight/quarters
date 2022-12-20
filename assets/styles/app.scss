@@ -38,6 +38,11 @@ table {
         border: 1px solid #fff;
         padding: 0.25rem 0.5rem;
     }
+
+    thead {
+        background: rgba(255, 255, 255, 0.9);
+        color: #000;
+    }
 }
 
 hr {

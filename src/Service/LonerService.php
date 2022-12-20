@@ -53,6 +53,7 @@ class LonerService {
         );
 
         $loner->setHealth(100);
+        $loner->setMorale(rand(70, 100));
 
         $loner->setExperience(0);
         if($loner->getRole() != SoldierRoles::CITIZEN){
@@ -75,6 +76,7 @@ class LonerService {
         $to->setExperience($from->getExperience());
         $to->setWeapon($from->getWeapon());
         $to->setInjuries($from->getInjuries());
+        $to->setMorale($from->getMorale());
     }
 
     public function assignLonerToUser(Loner $loner, User $user): void
@@ -94,6 +96,7 @@ class LonerService {
         $loner->setX($user->getX());
         $loner->setY($user->getY());
         $this->soldierDataTransfer($soldier, $loner);
+        $loner->setMorale(max(0, $loner->getMorale() - 10));
 
         $this->manager->persist($loner);
         $this->manager->remove($soldier);

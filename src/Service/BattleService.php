@@ -20,6 +20,7 @@ class BattleService {
         private readonly BattleRepository $battleRepository,
         private readonly ActionRepository $actionRepository,
         private readonly InjuryService $injuryService,
+        private readonly SquadService $squadService,
         private readonly ManagerRegistry $doctrine,
     ) {
         $this->manager = $this->doctrine->getManager();
@@ -90,11 +91,13 @@ class BattleService {
                     foreach ($users as $user) {
                         $manpower = count($user->getSoldiers());
                         $enemyManpower = 0;
+                        $enemyFirepower = 0;
                         $enemies = [];
 
                         foreach ($users as $enemy) {
                             if ($enemy->getFaction() !== $user->getFaction()) {
                                 $enemyManpower += count($enemy->getSoldiers());
+                                $enemyFirepower += $this->squadService->getFirePower($enemy);
                                 $enemies[] = $enemy;
                             }
                         }
@@ -105,14 +108,15 @@ class BattleService {
 
                         $currentAction = $this->actionRepository->findUserCurrentAction($user);
                         if($currentAction !== null){
-                            $enemyManpower *= 2;
+                            $enemyFirepower *= 2;
                         }
 
-                        $hits = min($manpower, rand(1, (int)ceil($enemyManpower / 2)));
+                        $hits = min($manpower, rand(1, (int)ceil($enemyFirepower / 2)));
                         for ($h = 0; $h < $hits; $h++) {
                             $soldiersArray = $user->getSoldiers()->toArray();
                             $unfortunate = $soldiersArray[array_rand($soldiersArray)];
                             $unfortunate->setHealth($unfortunate->getHealth() - rand(15, 70));
+                            $unfortunate->setMorale(max(0, $unfortunate->getMorale() - rand(20, 60)));
                             if ($unfortunate->getHealth() <= 0) {
                                 $this->manager->remove($unfortunate);
 

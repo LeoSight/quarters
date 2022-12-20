@@ -29,16 +29,19 @@ class Loner
     private ?SoldierRoles $role = SoldierRoles::CITIZEN;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $health = 100;
+    private int $health = 100;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $experience = 0;
+    private int $experience = 0;
 
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $weapon = 0;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $injuries = null;
+
+    #[ORM\Column(type: Types::SMALLINT)]
+    private int $morale = 50;
 
     public function getId(): ?int
     {
@@ -153,6 +156,18 @@ class Loner
         }
 
         $this->injuries = json_encode($injuries) ?: null;
+        return $this;
+    }
+
+    public function getMorale(): ?int
+    {
+        return $this->morale;
+    }
+
+    public function setMorale(int $morale): self
+    {
+        $this->morale = $morale;
+
         return $this;
     }
 }
