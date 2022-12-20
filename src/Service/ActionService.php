@@ -12,6 +12,7 @@ use App\Enum\NotificationTypes;
 use App\Enum\SoldierRoles;
 use App\Model\MoveAction;
 use App\Repository\ActionRepository;
+use App\Repository\BattleRepository;
 use App\Repository\ItemRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
@@ -29,6 +30,7 @@ class ActionService {
     public function __construct(
         private readonly ActionRepository $actionRepository,
         private readonly ItemRepository $itemRepository,
+        private readonly BattleRepository $battleRepository,
         private readonly ItemService $itemService,
         private readonly LonerService $lonerService,
         private readonly BattleService $battleService,
@@ -85,6 +87,15 @@ class ActionService {
         $this->lonerService->findLonerByChance($data->getX(), $data->getY());
 
         $soldiers = $user->getSoldiers();
+
+        // při útěku z bitvy
+        $battle = $this->battleRepository->findBy(['x' => $user->getX(), 'y' => $user->getY()]);
+        if($battle){
+            foreach ($soldiers as $soldier) {
+                $soldier->setMorale(max(0, $soldier->getMorale() - rand(1, 4)));
+            }
+        }
+
         if(count($soldiers) > 16) {
             foreach ($soldiers as $soldier) {
                 if ($soldier->getMorale() < 20 && $soldier->getHealth() > 50 && rand(1, 5) == 1) {
