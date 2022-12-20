@@ -37,6 +37,9 @@ class Soldier
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $injuries = null;
 
+    #[ORM\Column(type: Types::SMALLINT)]
+    private int $morale = 50;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -138,6 +141,18 @@ class Soldier
         }
 
         $this->injuries = json_encode($injuries) ?: null;
+        return $this;
+    }
+
+    public function getMorale(): int
+    {
+        return $this->morale;
+    }
+
+    public function setMorale(int $morale): self
+    {
+        $this->morale = $morale;
+
         return $this;
     }
 }

@@ -11,6 +11,7 @@ use App\Repository\ItemRepository;
 use App\Repository\SoldierRepository;
 use App\Service\ItemService;
 use App\Service\LonerService;
+use App\Service\SquadService;
 use App\Service\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,6 +27,7 @@ class SquadController extends AbstractController
         private readonly ItemRepository $itemRepository,
         private readonly ItemService $itemService,
         private readonly LonerService $lonerService,
+        private readonly SquadService $squadService,
         private readonly UserService $userService,
         private readonly ManagerRegistry $doctrine
     ) {}
@@ -52,13 +54,16 @@ class SquadController extends AbstractController
             $current = [ 'type' => $currentAction->getType(), 'data' => json_decode($currentAction->getData() ?? '[]') ];
         }
 
+        $speed = $this->squadService->getMovementInterval($user);
+
         return $this->render('game/squad.twig', [
             'soldiers' => $soldiers,
             'inventory' => $inventory,
             'items' => $items,
             'battle' => $battle,
             'busy' => $busy,
-            'current' => $current
+            'current' => $current,
+            'speed' => $speed
         ]);
     }
 

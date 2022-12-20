@@ -17,6 +17,7 @@ use App\Repository\UserRepository;
 use App\Service\ItemService;
 use App\Service\LonerService;
 use App\Service\ProductionService;
+use App\Service\SquadService;
 use App\Service\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,6 +35,7 @@ class MapController extends AbstractController
         private readonly ItemRepository $itemRepository,
         private readonly ProductionService $productionService,
         private readonly LonerService $lonerService,
+        private readonly SquadService $squadService,
         private readonly ItemService $itemService,
         private readonly UserService $userService,
         private readonly ManagerRegistry $doctrine
@@ -126,6 +128,8 @@ class MapController extends AbstractController
             'items' => $locationItems
         ];
 
+        $speed = $this->squadService->getMovementInterval($user);
+
         return $this->render('game/map.twig', [
             'x' => $x,
             'y' => $y,
@@ -138,7 +142,8 @@ class MapController extends AbstractController
             'busy' => $busy,
             'current' => $current,
             'user' => $user,
-            'items' => $items
+            'items' => $items,
+            'speed' => $speed
         ]);
     }
 
@@ -180,12 +185,14 @@ class MapController extends AbstractController
             return $this->redirectToRoute('game_map');
         }
 
-        $user->setBusyTill(new \DateTime('2 minute'));
+        $secondsToMove = $this->squadService->getMovementInterval($user);
+
+        $user->setBusyTill((new \DateTime())->modify('+' . $secondsToMove . ' seconds'));
 
         $action = new Action();
         $action->setUser($user);
         $action->setType(ActionTypes::MOVE);
-        $action->setRunTime(new \DateTime('1 minute'));
+        $action->setRunTime((new \DateTime())->modify('+' . round($secondsToMove / 2) . ' seconds'));
         $action->setData([ 'x' => $x, 'y' => $y ]);
 
         $this->doctrine->getManager()->persist($action);
@@ -210,7 +217,7 @@ class MapController extends AbstractController
 
         $this->lonerService->assignLonerToUser($loner, $user);
 
-        return $this->redirectToRoute('game_squad');
+        return $this->redirectToRoute('game_map');
     }
 
     #[Route('/game/map/capture', name: 'game_map_capture')]
@@ -241,6 +248,8 @@ class MapController extends AbstractController
         }
 
         $town->setOwner($user->getFaction());
+
+        $user->setBusyTill(new \DateTime('10 minute'));
 
         $this->doctrine->getManager()->flush();
 

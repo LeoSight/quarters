@@ -12,6 +12,7 @@
 {% set size = 0 %}
 {% set movement = '' %}
 {% set battle = false %}
+{% set lastFaction = 0 %}
 
 {% for field in fields %}
     {% if field.x == x and field.y == y %}
@@ -36,9 +37,16 @@
             {% set icon = '<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M10 2h4v4h-4V2zM7 7h10v2h-2v13h-2v-6h-2v6H9V9H7V7zm-2 4h2V9H5v2zm0 0v2H3v-2h2zm14 0h-2V9h2v2zm0 0h2v2h-2v-2z" fill="currentColor"/> </svg>' %}
             {% if player.faction is not null %}
                 {% set icon = '<div class="player-icon" style="color:#' ~ player.faction.color ~ ';">' ~ icon ~ '</div>' %}
+                {% set lastFaction = player.faction.id %}
             {% endif %}
         {% else %}
             {% set icon = '<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"> <path d="M13 2h1v1h-1zM14 2h1v1h-1zM15 2h1v1h-1zM13 3h1v1h-1zM14 3h1v1h-1zM15 3h1v1h-1zM13 4h1v1h-1zM14 4h1v1h-1zM15 4h1v1h-1zM12 6h1v1h-1zM13 6h1v1h-1zM14 6h1v1h-1zM15 6h1v1h-1zM16 6h1v1h-1zM4 7h1v1H4zM5 7h1v1H5zM6 7h1v1H6zM11 7h1v1h-1zM13 7h1v1h-1zM14 7h1v1h-1zM15 7h1v1h-1zM17 7h1v1h-1zM4 8h1v1H4zM5 8h1v1H5zM6 8h1v1H6zM10 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM15 8h1v1h-1zM18 8h1v1h-1zM4 9h1v1H4zM5 9h1v1H5zM6 9h1v1H6zM13 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM13 10h1v1h-1zM15 10h1v1h-1zM3 11h1v1H3zM4 11h1v1H4zM5 11h1v1H5zM6 11h1v1H6zM7 11h1v1H7zM13 11h1v1h-1zM15 11h1v1h-1zM2 12h1v1H2zM4 12h1v1H4zM5 12h1v1H5zM6 12h1v1H6zM8 12h1v1H8zM13 12h1v1h-1zM15 12h1v1h-1zM1 13h1v1H1zM4 13h1v1H4zM5 13h1v1H5zM6 13h1v1H6zM9 13h1v1H9zM4 14h1v1H4zM5 14h1v1H5zM6 14h1v1H6zM4 15h1v1H4zM6 15h1v1H6zM4 16h1v1H4zM6 16h1v1H6zM4 17h1v1H4zM6 17h1v1H6z" fill="currentColor"/> </svg>' %}
+            {% if player.faction is not null and player.faction.id == lastFaction %}
+                {% set icon = '<div class="player-icon" style="color:#' ~ player.faction.color ~ ';">' ~ icon ~ '</div>' %}
+                {% set lastFaction = player.faction.id %}
+            {% else %}
+                {% set lastFaction = 0 %}
+            {% endif %}
         {% endif %}
         {% set icon = icon ~ '<span class="squad-size">' ~ size ~ '</span>' %}
 

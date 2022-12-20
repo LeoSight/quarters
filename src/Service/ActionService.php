@@ -4,12 +4,15 @@ namespace App\Service;
 
 use App\Entity\Action;
 use App\Entity\Item;
+use App\Entity\Notification;
 use App\Entity\Soldier;
 use App\Enum\ActionStates;
 use App\Enum\ActionTypes;
+use App\Enum\NotificationTypes;
 use App\Enum\SoldierRoles;
 use App\Model\MoveAction;
 use App\Repository\ActionRepository;
+use App\Repository\BattleRepository;
 use App\Repository\ItemRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
@@ -27,6 +30,7 @@ class ActionService {
     public function __construct(
         private readonly ActionRepository $actionRepository,
         private readonly ItemRepository $itemRepository,
+        private readonly BattleRepository $battleRepository,
         private readonly ItemService $itemService,
         private readonly LonerService $lonerService,
         private readonly BattleService $battleService,
@@ -82,6 +86,29 @@ class ActionService {
 
         $this->lonerService->findLonerByChance($data->getX(), $data->getY());
 
+        $soldiers = $user->getSoldiers();
+
+        // při útěku z bitvy
+        $battle = $this->battleRepository->findBy(['x' => $user->getX(), 'y' => $user->getY()]);
+        if($battle){
+            foreach ($soldiers as $soldier) {
+                $soldier->setMorale(max(0, $soldier->getMorale() - rand(1, 4)));
+            }
+        }
+
+        if(count($soldiers) > 16) {
+            foreach ($soldiers as $soldier) {
+                if ($soldier->getMorale() < 20 && $soldier->getHealth() > 50 && rand(1, 5) == 1) {
+                    $notification = new Notification();
+                    $notification->setType(NotificationTypes::WARNING);
+                    $notification->setMessage('Máme tu dezertéra! ' . $soldier->getName() . ' vzal roha!');
+                    $user->addNotification($notification);
+                    $this->manager->persist($notification);
+                    $this->manager->remove($soldier);
+                }
+            }
+        }
+
         $user->setCoords([ $data->getX(), $data->getY() ]);
         $action->setStatus(ActionStates::DONE);
 
@@ -98,6 +125,9 @@ class ActionService {
         }
 
         $soldiers = $user->getSoldiers();
+
+        // LÉČENÍ
+
         $injured = $soldiers->filter(function(Soldier $soldier){ return $soldier->getHealth() < 100 || count($soldier->getInjuries() ?? []) > 0; });
 
         $criteria = Criteria::create()->orderBy(["health" => Criteria::ASC]);
@@ -123,6 +153,20 @@ class ActionService {
 
             $soldier->setHealth(min(100, $soldier->getHealth() + $heal));
             $soldier->setInjuries(null);
+        }
+
+        // MORÁLKA
+
+        $totalMorale = 0;
+        foreach($soldiers as $soldier){
+            $totalMorale += $soldier->getMorale();
+        }
+
+        $avgMorale = round($totalMorale / count($soldiers));
+        $moraleBoost = (int)ceil(max(0, (16 - count($soldiers))) / 3);
+        foreach($soldiers as $soldier){
+            $morale = $soldier->getMorale();
+            $soldier->setMorale($morale + ($avgMorale <=> $morale) * (int)ceil(0.1 * abs($avgMorale - $morale)) + $moraleBoost);
         }
 
         $action->setStatus(ActionStates::DONE);
