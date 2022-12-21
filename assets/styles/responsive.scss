@@ -1,0 +1,52 @@
+$breakpoint-tablet: 768px;
+$breakpoint-mobile: 480px;
+
+@media screen and (max-width: $breakpoint-tablet) {
+    .desktop-only {
+        display: none;
+    }
+
+    .headline {
+        font-size: 3rem;
+    }
+
+    .notification {
+        flex-direction: column;
+
+        .time {
+            width: unset;
+            flex: unset;
+            text-align: left;
+            padding-top: 0;
+        }
+    }
+
+    .map-container {
+        flex-direction: column;
+    }
+
+    .map {
+        flex: unset;
+        margin-top: 1rem;
+        font-size: 10px;
+    }
+
+    .row {
+        flex-direction: column;
+    }
+
+    .squad-row {
+        flex-direction: column-reverse;
+    }
+}
+
+@media screen and (max-width: $breakpoint-mobile) {
+    .dashboard-menu {
+        flex-direction: column;
+
+        a {
+            width: 100%;
+            margin: 0.3rem 0;
+        }
+    }
+}

@@ -9,6 +9,7 @@
     margin: 0 auto;
     width: 100%;
     max-width: 1200px;
+    padding: 0 0.75rem;
 }
 
 .flex {
@@ -71,6 +72,7 @@
     border: 0.2rem solid $link;
     text-transform: uppercase;
     font-weight: 700;
+    text-align: center;
 
     &:hover {
         border-color: $link-hover;
@@ -87,10 +89,4 @@
 
 .green {
     color: #43b943;
-}
-
-@media screen and (max-width: 800px) {
-    .desktop-only {
-        display: none;
-    }
 }
