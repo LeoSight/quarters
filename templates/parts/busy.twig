@@ -1,6 +1,9 @@
 {% if busy %}
     <div class="busy">
-        <p class="red">Tvá jednotka právě plní rozkaz, bude zaneprázdněná až do {{ busy }}</p>
+        <p class="red">
+            Tvá jednotka právě plní rozkaz, bude zaneprázdněná až do
+            <span class="busy-timer" data-controller="busy" data-busy-interval-value="{{ busy.seconds }}">{{ busy.time }}</span>
+        </p>
         {% if current %}
             {% if current.type.value == 1 %}
                 <p class="yellow">Právě probíhá přesun na souřadnice {{ current.data.x }},{{ current.data.y }}</p>

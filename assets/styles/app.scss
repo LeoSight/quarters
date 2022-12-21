@@ -14,7 +14,7 @@ body {
 }
 
 h1, h2 {
-    font-family: 'Rubik 80s Fade', cursive;
+    font-family: 'Rubik 80s Fade', sans-serif;
 }
 
 a {
@@ -27,7 +27,7 @@ a {
 }
 
 footer {
-    margin-bottom: 8rem;
+    padding-bottom: 8rem;
 }
 
 table {
@@ -99,3 +99,5 @@ button {
         }
     }
 }
+
+@import 'responsive';

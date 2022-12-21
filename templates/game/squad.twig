@@ -14,8 +14,8 @@
         <p>Akce: <a href="/game/squad/rest">Zahájit odpočinek (5m)</a></p>
     {% endif %}
 
-    <div class="row mt-2">
-        <div class="col">
+    <div class="row squad-row">
+        <div class="col mt-2">
             {% if soldiers|length > 0 %}
                 <table>
                     <thead>
@@ -66,7 +66,7 @@
                 </table>
             {% endif %}
         </div>
-        <div class="col">
+        <div class="col mt-2">
             {% if inventory|length > 0 %}
                 <table>
                     {% for item in inventory %}
