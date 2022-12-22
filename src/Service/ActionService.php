@@ -126,47 +126,55 @@ class ActionService {
 
         $soldiers = $user->getSoldiers();
 
-        // LÉČENÍ
+        if(count($soldiers) > 0) {
 
-        $injured = $soldiers->filter(function(Soldier $soldier){ return $soldier->getHealth() < 100 || count($soldier->getInjuries() ?? []) > 0; });
+            // LÉČENÍ
 
-        $criteria = Criteria::create()->orderBy(["health" => Criteria::ASC]);
-        $injured = (new ArrayCollection($injured->toArray()))->matching($criteria);
+            $injured = $soldiers->filter(function (Soldier $soldier) {
+                return $soldier->getHealth() < 100 || count($soldier->getInjuries() ?? []) > 0;
+            });
 
-        $medics = count($soldiers->filter(function($soldier){ return $soldier->getRole() == SoldierRoles::MEDIC; }));
-        $healPower = $medics * 30;
+            $criteria = Criteria::create()->orderBy(["health" => Criteria::ASC]);
+            $injured = (new ArrayCollection($injured->toArray()))->matching($criteria);
 
-        $medKits = $this->itemRepository->findOneBy([ 'user' => $user, 'itemId' => 1 ]);
+            $medics = count($soldiers->filter(function ($soldier) {
+                return $soldier->getRole() == SoldierRoles::MEDIC;
+            }));
+            $healPower = $medics * 30;
 
-        foreach($injured as $soldier){
-            $heal = rand(1,3);
-            if ($healPower > 0) {
-                $heal = min($healPower, 100 - $soldier->getHealth());
-                if($heal > 20){
-                    if (!$medKits || !$this->itemService->deplete($medKits)) {
-                        $heal = rand(1,5);
+            $medKits = $this->itemRepository->findOneBy(['user' => $user, 'itemId' => 1]);
+
+            foreach ($injured as $soldier) {
+                $heal = rand(1, 3);
+                if ($healPower > 0) {
+                    $heal = min($healPower, 100 - $soldier->getHealth());
+                    if ($heal > 20) {
+                        if (!$medKits || !$this->itemService->deplete($medKits)) {
+                            $heal = rand(1, 5);
+                        }
                     }
+
+                    $healPower -= $heal;
                 }
 
-                $healPower -= $heal;
+                $soldier->setHealth(min(100, $soldier->getHealth() + $heal));
+                $soldier->setInjuries(null);
             }
 
-            $soldier->setHealth(min(100, $soldier->getHealth() + $heal));
-            $soldier->setInjuries(null);
-        }
+            // MORÁLKA
 
-        // MORÁLKA
+            $totalMorale = 0;
+            foreach ($soldiers as $soldier) {
+                $totalMorale += $soldier->getMorale();
+            }
 
-        $totalMorale = 0;
-        foreach($soldiers as $soldier){
-            $totalMorale += $soldier->getMorale();
-        }
+            $avgMorale = round($totalMorale / count($soldiers));
+            $moraleBoost = (int)ceil(max(0, (16 - count($soldiers))) / 3);
+            foreach ($soldiers as $soldier) {
+                $morale = $soldier->getMorale();
+                $soldier->setMorale($morale + ($avgMorale <=> $morale) * (int)ceil(0.1 * abs($avgMorale - $morale)) + $moraleBoost);
+            }
 
-        $avgMorale = round($totalMorale / count($soldiers));
-        $moraleBoost = (int)ceil(max(0, (16 - count($soldiers))) / 3);
-        foreach($soldiers as $soldier){
-            $morale = $soldier->getMorale();
-            $soldier->setMorale($morale + ($avgMorale <=> $morale) * (int)ceil(0.1 * abs($avgMorale - $morale)) + $moraleBoost);
         }
 
         $action->setStatus(ActionStates::DONE);
